@@ -561,6 +561,16 @@
   .an-custo-box strong{color:var(--text-dim);}
   .an-custo-box .mono{font-family:var(--font-mono);}
 
+  .an-selecao-card{
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:12px 14px;
+    margin-bottom:10px;
+    background:var(--surface-2);
+  }
+  .an-selecao-card .an-suggestion-top{margin-bottom:8px;}
+  .an-selecao-card .an-suggestion-market{font-size:13px;}
+
   .an-raw-response{
     margin-top:16px;
     padding:14px;
@@ -1926,24 +1936,25 @@
 SOBRE O TEXTO EXTRAÍDO DA PÁGINA: trechos entre ** ** (ex: **6.6**) estavam em negrito/destaque na página original. Em células com números empilhados (ex: "10.8 **6.6** 4.2"), o padrão observado é: o número do meio em negrito é o valor específico de UM time, enquanto os números menores ao redor costumam ser o total combinado dos dois times e/ou o valor do adversário (muitas vezes os dois menores somados batem com o maior — isso confirma que o maior é o total). NUNCA trate o número "total combinado dos dois times" como se fosse a média de um único time.
 
 MÉTODO DE PROJEÇÃO (siga essa ordem):
-1. Escolha o mercado avaliando TODOS os que aparecem nos dados (não escolha por hábito). Para CADA mercado disponível (escanteios, gols, cartões, faltas, finalizações, finalizações no alvo, posse, passes, xG, desarmes — os que tiverem dado suficiente), calcule a expectativa combinada e o CV antes de decidir qual usar. Escanteios costuma ter CV mais baixo que cartões/faltas/finalizações — isso tende a fazer esse mercado "vencer" com facilidade, mas essa menor variância sozinha NÃO é motivo suficiente pra escolhê-lo. Só escolha escanteios se ele tiver, numericamente, a melhor relação risco/retorno frente aos outros mercados que também tinham dado suficiente pra avaliar — não porque é o hábito ou o mais "seguro" por padrão.
-2. Projete a expectativa do jogo pra esse mercado SOMANDO o recorte específico de cada time quando disponível — ex: média do mandante EM CASA + média do visitante FORA (não a média geral de cada time, que mistura jogos em casa e fora). Essa soma tende a ser mais precisa que usar só uma média combinada genérica.
-3. A partir dessa expectativa, monte uma pequena tabela com 2 a 3 linhas de mercado próximas (uma abaixo da expectativa, uma nela, uma acima), calculando a odd justa de cada uma (baseada na probabilidade estimada de passar daquela linha, JÁ com o desconto do item 4). Anote pra cada linha se tem valor, valor baixo, ou risco maior — a linha escolhida deve ser a de MELHOR relação risco/retorno, não necessariamente a de maior valor bruto (uma margem de segurança maior costuma valer mais que um pouco mais de odd).
-4. SEJA CONSERVADOR NA PROBABILIDADE: amostras de 5-10 jogos são pequenas. "Bateu em 9 de 10" NÃO é 90% real — é excesso de confiança. Puxe a taxa bruta em direção a 50%, tipicamente descontando 15-25 pontos percentuais (mais desconto quanto menor a amostra ou maior o CV). NUNCA estime acima de 80%, mesmo com amostra "perfeita".
+1. Avalie TODOS os mercados disponíveis nos dados pra ambos os times (escanteios, gols, cartões, faltas, finalizações, finalizações no alvo, posse, passes, xG, desarmes — os que tiverem dado suficiente), calculando expectativa combinada e CV pra cada um antes de decidir.
+2. Monte um BILHETE com 2 a 3 seleções desse mesmo jogo (não um mercado só). Escolha seleções de NATUREZAS DIFERENTES entre si — ex: finalizações + escanteios + chance dupla, ou cartões + finalizações no alvo + resultado — evitando combinar duas seleções que medem quase a mesma coisa (ex: não combine "finalizações totais do time A" com "finalizações no alvo do time A" na mesma aposta, são muito correlacionadas). Cada seleção pode ser de mercado do jogo todo ou de um time específico.
+3. Pra cada seleção, prefira uma margem de segurança folgada (linha um pouco abaixo da expectativa, favorecendo alta probabilidade) — o objetivo aqui é somar confiança em cada perna do bilhete, não maximizar a odd perna a perna. Calcule a odd justa de cada seleção já com o desconto do item 4.
+4. SEJA CONSERVADOR NA PROBABILIDADE em cada seleção: amostras de 5-10 jogos são pequenas. "Bateu em 9 de 10" NÃO é 90% real — é excesso de confiança. Puxe a taxa bruta em direção a 50%, tipicamente descontando 15-25 pontos percentuais (mais desconto quanto menor a amostra ou maior o CV). NUNCA estime acima de 80% em nenhuma seleção, mesmo com amostra "perfeita".
 5. Considere fatores de contexto que ajudam a explicar ou reforçar a direção (favoritismo/disputa esperada, estilo de jogo, mando de campo, tendência recente jogo a jogo) — mas como reforço da leitura numérica, não como substituto dela.
-6. Só sugira se pelo menos DOIS sinais independentes apontarem na mesma direção. Em "descartados", registre TODOS os outros mercados com dado suficiente pra avaliar (não só um ou dois) — cada um com número real (expectativa combinada e/ou CV), nunca uma frase genérica sem número. Ex: "Cartões: 4.1 combinado (2.2 casa + 1.9 fora), CV 0.46 — pior consistência que escanteios (CV 0.31)". Se um mercado não tinha dado suficiente pra calcular, diga isso explicitamente em vez de inventar número.
-7. Depois de tudo, se a odd de valor da melhor linha ficar abaixo do piso de 1.50, ou se os sinais forem fracos/conflitantes, ou os dados forem insuficientes: responda com erro em vez de forçar uma sugestão. Prefira não sugerir a sugerir mal.
+6. A odd combinada do bilhete é o PRODUTO das odds justas de cada seleção. A probabilidade combinada é o produto das probabilidades individuais (já descontadas) — ela vai ficar naturalmente mais baixa que qualquer seleção isolada, isso é esperado.
+7. Em "descartados", registre os mercados com dado suficiente que NÃO entraram no bilhete — seja por CV alto, seja por serem redundantes/correlacionados com uma seleção já escolhida — cada um com número real (expectativa e/ou CV), nunca uma frase genérica sem número.
+8. Depois de tudo, se a odd combinada final ficar abaixo do piso de 1.50, ou se não houver pelo menos 2 seleções com sinal forte o bastante, ou os dados forem insuficientes: responda com erro em vez de forçar um bilhete fraco. Prefira não sugerir a sugerir mal.
 
 MOMENTO REAL DOS TIMES: se os dados mostrarem jogo a jogo (não só a média consolidada), comente se há tendência clara nos jogos mais recentes (subindo, caindo, estável). Se só houver a média consolidada, diga isso e não invente tendência.
 
 Se a data e o horário de início da partida aparecerem nos dados (print ou texto extraído), inclua no formato "data_jogo": "dd/mm" e "hora_jogo": "HH:mm". Se não aparecerem, retorne esses dois campos como null — não invente.
 
-No campo "time", SEMPRE informe os dois times do confronto no formato "Time A x Time B" — mesmo quando a linha sugerida for de um mercado específico de só um dos lados (ex: cartões só do time da casa). Nesse caso, além dos dois times em "time", informe em "time_alvo" o nome exato do time ao qual a linha se refere. Se a linha for de um mercado do jogo todo (envolvendo os dois times, ex: escanteios totais do jogo), retorne "time_alvo": null.
+No campo "time", SEMPRE informe os dois times do confronto no formato "Time A x Time B". Cada seleção dentro de "selecoes" tem seu próprio campo "time_alvo": informe o nome exato do time se a seleção for de um mercado específico de um dos lados (ex: cartões só do time da casa), ou null se for uma seleção do jogo todo/geral (ex: escanteios totais do jogo, chance dupla).
 
 Responda APENAS com um objeto JSON, sem markdown, sem texto antes ou depois, exatamente neste formato:
-{"time": "Time A x Time B", "time_alvo": "nome do time ou null", "mercado": "...", "data_jogo": "dd/mm ou null", "hora_jogo": "HH:mm ou null", "linha_sugerida": "...", "media_observada": "ex: 5.8 casa (Flu) + 10.4 fora (Platense) → projeção 9.7", "odd_valor": "odd justa calculada da linha escolhida, ex: 1.65", "probabilidade_estimada": "ex: 61% (já descontada)", "amostra": "ex: 5 jogos cada lado, CV 0.31", "tabela_linhas": [{"linha": "ex: Mais de 7.5", "odd_justa": "1.35", "situacao": "positivo mas odd baixa"}, {"linha": "ex: Mais de 8.5", "odd_justa": "1.61", "situacao": "melhor relação"}, {"linha": "ex: Mais de 9.5", "odd_justa": "1.85", "situacao": "valor alto, risco maior"}], "justificativa": "no máximo 4 frases: a lógica do cálculo aditivo, o desconto aplicado, e por que essa linha (não outra) tem a melhor relação risco/retorno", "descartados": [{"mercado": "ex: Gols", "motivo": "frase curta com o número que descarta"}], "mercados_avaliados": ["lista curta de todos os mercados vistos"], "alertas": ["no máximo 3 itens curtos"]}
+{"time": "Time A x Time B", "data_jogo": "dd/mm ou null", "hora_jogo": "HH:mm ou null", "selecoes": [{"mercado": "ex: Escanteios", "linha_sugerida": "ex: Mais de 4.5", "time_alvo": "nome do time ou null", "media_observada": "ex: 5.8 casa (Flu) + 4.2 fora (Platense) → projeção 10", "odd_justa": "1.25", "probabilidade_estimada": "76% (já descontada)", "amostra": "ex: 8 jogos cada lado, CV 0.31"}], "odd_combinada": "produto das odds justas de cada seleção, ex: 1.72", "probabilidade_combinada": "produto das probabilidades individuais, ex: 44% (já descontada)", "justificativa": "no máximo 5 frases: por que essas seleções foram combinadas (o que cada uma cobre, por que não são redundantes entre si) e o desconto aplicado", "descartados": [{"mercado": "ex: Gols", "motivo": "frase curta com o número que descarta"}], "mercados_avaliados": ["lista curta de todos os mercados vistos"], "alertas": ["no máximo 3 itens curtos"]}
 
-Seja objetivo em todos os campos — respostas longas correm risco de cortar o JSON. O JSON precisa ser válido: tudo em uma linha só, sem quebra de linha dentro dos textos. Se nenhuma linha passar do piso de 1.50 depois do desconto, ou os dados forem insuficientes, responda com {"erro": "motivo em uma frase"} em vez do formato acima.`;
+Seja objetivo em todos os campos — respostas longas correm risco de cortar o JSON. O JSON precisa ser válido: tudo em uma linha só, sem quebra de linha dentro dos textos. Se a odd combinada não passar do piso de 1.50 depois do desconto, ou os dados forem insuficientes, responda com {"erro": "motivo em uma frase"} em vez do formato acima.`;
 
   anAnalyzeBtn.addEventListener('click', async () => {
     if(anImages.length === 0 && !anHtmlText) return;
@@ -2012,16 +2023,11 @@ Seja objetivo em todos os campos — respostas longas correm risco de cortar o J
       }
       const docRef = await analisesRef.add({
         time: p.time || null,
-        timeAlvo: p.time_alvo || null,
-        mercado: p.mercado || null,
         dataJogo: p.data_jogo || null,
         horaJogo: p.hora_jogo || null,
-        linha_sugerida: p.linha_sugerida || null,
-        media_observada: p.media_observada || null,
-        odd_valor: p.odd_valor || null,
-        probabilidade_estimada: p.probabilidade_estimada || null,
-        amostra: p.amostra || null,
-        tabela_linhas: p.tabela_linhas || [],
+        selecoes: p.selecoes || [],
+        odd_combinada: p.odd_combinada || null,
+        probabilidade_combinada: p.probabilidade_combinada || null,
         descartados: p.descartados || [],
         justificativa: p.justificativa || null,
         mercados_avaliados: p.mercados_avaliados || [],
@@ -2036,24 +2042,37 @@ Seja objetivo em todos os campos — respostas longas correm risco de cortar o J
     }
   }
 
+  function renderSelecaoCard(s, idx){
+    return `
+      <div class="an-selecao-card">
+        <div class="an-suggestion-top">
+          <div>
+            <div class="an-suggestion-market">Seleção ${idx + 1} · ${escapeHtml(s.mercado || '—')}${s.time_alvo ? ` <span class="sep">·</span> ${escapeHtml(s.time_alvo)}` : ''}</div>
+          </div>
+          <div class="an-suggestion-pill">${escapeHtml(s.linha_sugerida || '—')}</div>
+        </div>
+        <div class="an-suggestion-stats">
+          <div class="stat-chip"><span class="stat-chip-label">Média observada</span><span class="stat-chip-value safe">${escapeHtml(s.media_observada || '—')}</span></div>
+          <div class="stat-chip"><span class="stat-chip-label">Odd justa</span><span class="stat-chip-value safe">${escapeHtml(s.odd_justa || '—')}</span></div>
+          ${s.probabilidade_estimada ? `<div class="stat-chip"><span class="stat-chip-label">Probabilidade</span><span class="stat-chip-value">${escapeHtml(s.probabilidade_estimada)}</span></div>` : ''}
+          ${s.amostra ? `<div class="stat-chip"><span class="stat-chip-label">Amostra</span><span class="stat-chip-value">${escapeHtml(s.amostra)}</span></div>` : ''}
+        </div>
+      </div>`;
+  }
+
   function renderAnalise(p, usage){
     if(p.erro){
       anResult.innerHTML = `<div class="empty-state">${escapeHtml(p.erro)}</div>`;
       return;
     }
+    const selecoes = p.selecoes || [];
     const alertasHtml = (p.alertas && p.alertas.length)
       ? `<span class="an-alertas-title">Pontos de atenção</span><ul class="an-alertas">${p.alertas.map(a => `<li>${escapeHtml(a)}</li>`).join('')}</ul>`
       : '';
     const mercadosHtml = (p.mercados_avaliados && p.mercados_avaliados.length)
       ? `<div class="an-mercados-avaliados"><span class="an-alertas-title">Mercados avaliados</span>${p.mercados_avaliados.map(m => `<span class="an-mercado-chip">${escapeHtml(m)}</span>`).join('')}</div>`
       : '';
-    const tabelaLinhasHtml = (p.tabela_linhas && p.tabela_linhas.length)
-      ? `<div class="an-linhas-table">
-          <span class="an-alertas-title">Comparativo de linhas</span>
-          <div class="an-linhas-header"><span>Linha</span><span>Odd justa</span><span>Situação</span></div>
-          ${p.tabela_linhas.map(l => `<div class="an-linhas-row"><span>${escapeHtml(l.linha || '—')}</span><span class="mono">${escapeHtml(l.odd_justa || '—')}</span><span>${escapeHtml(l.situacao || '—')}</span></div>`).join('')}
-        </div>`
-      : '';
+    const selecoesHtml = selecoes.map((s, i) => renderSelecaoCard(s, i)).join('');
     const descartadosHtml = (p.descartados && p.descartados.length)
       ? `<div class="an-mercados-avaliados"><span class="an-alertas-title">Descartados</span><ul class="an-alertas">${p.descartados.map(d => `<li><strong>${escapeHtml(d.mercado || '—')}:</strong> ${escapeHtml(d.motivo || '')}</li>`).join('')}</ul></div>`
       : '';
@@ -2071,19 +2090,13 @@ Seja objetivo em todos os campos — respostas longas correm risco de cortar o J
       <div class="an-suggestion-top">
         <div>
           <div class="an-suggestion-team">${escapeHtml(p.time || '—')}</div>
-          <div class="an-suggestion-market">${escapeHtml(p.mercado || '—')}</div>
+          <div class="an-suggestion-market">Bilhete com ${selecoes.length} seleç${selecoes.length === 1 ? 'ão' : 'ões'}</div>
         </div>
-        <div class="an-suggestion-pill">${escapeHtml(p.linha_sugerida || '—')}</div>
+        <div class="an-suggestion-pill">Odd ${escapeHtml(p.odd_combinada || '—')}</div>
       </div>
+      ${p.probabilidade_combinada ? `<div class="an-suggestion-stats"><div class="stat-chip"><span class="stat-chip-label">Probabilidade combinada</span><span class="stat-chip-value">${escapeHtml(p.probabilidade_combinada)}</span></div></div>` : ''}
 
-      <div class="an-suggestion-stats">
-        <div class="stat-chip"><span class="stat-chip-label">Média observada</span><span class="stat-chip-value safe">${escapeHtml(p.media_observada || '—')}</span></div>
-        <div class="stat-chip"><span class="stat-chip-label">Odd de valor</span><span class="stat-chip-value safe">${escapeHtml(p.odd_valor || '—')}</span></div>
-        ${p.probabilidade_estimada ? `<div class="stat-chip"><span class="stat-chip-label">Probabilidade estimada</span><span class="stat-chip-value">${escapeHtml(p.probabilidade_estimada)}</span></div>` : ''}
-        ${p.amostra ? `<div class="stat-chip"><span class="stat-chip-label">Amostra</span><span class="stat-chip-value">${escapeHtml(p.amostra)}</span></div>` : ''}
-      </div>
-
-      ${tabelaLinhasHtml}
+      ${selecoesHtml}
 
       <p class="an-justificativa">${escapeHtml(p.justificativa || '')}</p>
       ${descartadosHtml}
@@ -2091,7 +2104,7 @@ Seja objetivo em todos os campos — respostas longas correm risco de cortar o J
       ${alertasHtml}
 
       <div class="an-check-box">
-        <label for="an-check-odd">Qual odd você encontrou na casa?</label>
+        <label for="an-check-odd">Qual odd você encontrou na casa pra esse bilhete?</label>
         <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
           <input type="text" inputmode="decimal" id="an-check-odd" placeholder="1,85" style="max-width:140px;">
           <input type="text" id="an-check-casa" list="an-casas-list" placeholder="Pesquisar casa de apostas..." style="max-width:220px;">
@@ -2112,7 +2125,7 @@ Seja objetivo em todos os campos — respostas longas correm risco de cortar o J
 
     saveAnalise(p, usage);
 
-    const oddValorCalculada = parseFloat(String(p.odd_valor || '1.50').replace(',', '.'));
+    const oddValorCalculada = parseFloat(String(p.odd_combinada || '1.50').replace(',', '.'));
     const oddInput = document.getElementById('an-check-odd');
     maskDecimalInput(oddInput);
 
@@ -2175,8 +2188,11 @@ Seja objetivo em todos os campos — respostas longas correm risco de cortar o J
 
       const temPrintsOriginais = anImages.length > 0;
       const mercadosLista = (p.mercados_avaliados && p.mercados_avaliados.length) ? p.mercados_avaliados.join(', ') : '';
+      const selecoesLista = (p.selecoes || [])
+        .map((s, i) => `${i + 1}) mercado "${s.mercado || ''}", linha "${s.linha_sugerida || ''}"${s.time_alvo ? ` (${s.time_alvo})` : ''}, odd justa ${s.odd_justa || '—'}`)
+        .join('; ');
 
-      const confirmPrompt = `Eu tinha recebido essa sugestão de entrada, a partir de prints de estatísticas: time "${p.time || ''}", mercado "${p.mercado || ''}", linha sugerida "${p.linha_sugerida || ''}", odd de valor calculada ${p.odd_valor || '1.50'}${p.probabilidade_estimada ? `, probabilidade estimada ${p.probabilidade_estimada}` : ''}.
+      const confirmPrompt = `Eu tinha recebido essa sugestão de bilhete (${(p.selecoes || []).length} seleções combinadas), a partir de prints de estatísticas do jogo "${p.time || ''}": ${selecoesLista}. Odd combinada calculada: ${p.odd_combinada || '1.50'}${p.probabilidade_combinada ? `, probabilidade combinada estimada ${p.probabilidade_combinada}` : ''}.
 ${mercadosLista ? `Outros mercados que também apareciam nos prints de estatísticas e foram avaliados: ${mercadosLista}.` : ''}
 
 ${temPrintsOriginais
@@ -2184,16 +2200,16 @@ ${temPrintsOriginais
   : `Estou te mandando um print da tela de apostas de uma casa, mostrando a odd oferecida pra esse jogo.`}
 
 Sua tarefa:
-1. No print da casa de apostas, localize a odd do mercado/linha "${p.mercado || ''}" - "${p.linha_sugerida || ''}". Leia essa odd.
-2. Confirme se esse mercado aparece de fato no print (mercado_bate).
-3. Diga se essa odd tem valor (odd encontrada >= odd de valor calculada).
-${temPrintsOriginais ? `4. SE NÃO TIVER VALOR (ou esse mercado específico não aparecer no print da casa), procure no MESMO print da casa de apostas outros mercados que também deram pra ver nos prints de estatísticas originais. Para cada um, calcule a odd de valor com base nas estatísticas originais e veja se a odd oferecida na casa supera esse valor. Se encontrar um mercado alternativo com valor real, retorne os dados dele no campo "alternativa".` : ''}
+1. No print da casa de apostas, localize as odds de cada uma das seleções do bilhete listadas acima e multiplique-as pra chegar na odd combinada real oferecida por essa casa (ou, se a casa já mostrar a odd combinada de um bilhete com essas mesmas seleções, use ela direto). Retorne essa odd combinada em "odd_encontrada".
+2. Confirme se TODAS as seleções do bilhete aparecem de fato no print (mercado_bate = true só se todas baterem).
+3. Diga se essa odd combinada encontrada tem valor (odd encontrada >= odd combinada calculada).
+${temPrintsOriginais ? `4. SE NÃO TIVER VALOR (ou alguma seleção não aparecer no print da casa), procure no MESMO print da casa de apostas um bilhete alternativo com 2-3 seleções que também deram pra calcular a partir dos prints de estatísticas originais, com odd combinada real com valor. Se encontrar, retorne no campo "alternativa".` : ''}
 
 Responda APENAS com um objeto JSON, sem markdown, sem texto antes ou depois, exatamente neste formato:
 {"odd_encontrada": "...", "mercado_bate": true, "tem_valor": true, "validacao": "uma frase curta", "alternativa": null}
 
 Se encontrar uma alternativa com valor, o campo "alternativa" deve ser um objeto (não null) neste formato:
-{"mercado": "...", "linha_sugerida": "...", "odd_encontrada": "...", "odd_valor_calculada": "...", "justificativa": "uma frase curta"}
+{"selecoes_resumo": "resumo curto das seleções alternativas", "odd_encontrada": "...", "odd_valor_calculada": "...", "justificativa": "uma frase curta"}
 
 Se não conseguir ler a odd ou os mercados no print, responda com {"erro": "motivo em uma frase"}.`;
 
@@ -2244,8 +2260,7 @@ Se não conseguir ler a odd ou os mercados no print, responda com {"erro": "moti
           altBox.innerHTML = `
             <span class="an-alertas-title">A IA encontrou uma alternativa com valor nesse mesmo print</span>
             <div class="an-suggestion-top" style="margin:8px 0 6px;">
-              <div class="an-suggestion-market" style="font-size:14px;color:var(--text);font-weight:600;">${escapeHtml(alt.mercado || '—')}</div>
-              <div class="an-suggestion-pill">${escapeHtml(alt.linha_sugerida || '—')}</div>
+              <div class="an-suggestion-market" style="font-size:14px;color:var(--text);font-weight:600;">${escapeHtml(alt.selecoes_resumo || '—')}</div>
             </div>
             <div class="an-suggestion-stats" style="margin-bottom:8px;">
               <div class="stat-chip"><span class="stat-chip-label">Odd na casa</span><span class="stat-chip-value safe">${escapeHtml(alt.odd_encontrada || '—')}</span></div>
@@ -2386,6 +2401,8 @@ Se não conseguir ler a odd ou os mercados no print, responda com {"erro": "moti
         ? `<span class="an-odd-highlight">Melhor ODD Encontrada<strong>${Number(a.oddVista).toFixed(2)}</strong>${a.temValor === false ? ' (sem valor)' : ''}</span>`
         : '';
       const dataHoraJogo = [a.dataJogo, a.horaJogo].filter(Boolean).join(' · ');
+      const selecoes = a.selecoes || [];
+      const isBilhete = selecoes.length > 0;
 
       const mercadosHtml = (a.mercados_avaliados && a.mercados_avaliados.length)
         ? `<div class="an-mercados-avaliados"><span class="an-alertas-title">Mercados avaliados</span>${a.mercados_avaliados.map(m => `<span class="an-mercado-chip">${escapeHtml(m)}</span>`).join('')}</div>`
@@ -2393,7 +2410,8 @@ Se não conseguir ler a odd ou os mercados no print, responda com {"erro": "moti
       const alertasHtml = (a.alertas && a.alertas.length)
         ? `<span class="an-alertas-title">Pontos de atenção</span><ul class="an-alertas">${a.alertas.map(al => `<li>${escapeHtml(al)}</li>`).join('')}</ul>`
         : '';
-      const tabelaLinhasHtml = (a.tabela_linhas && a.tabela_linhas.length)
+      // Compat com análises antigas de 1 mercado só (sem "selecoes")
+      const tabelaLinhasHtml = (!isBilhete && a.tabela_linhas && a.tabela_linhas.length)
         ? `<div class="an-linhas-table">
             <span class="an-alertas-title">Comparativo de linhas</span>
             <div class="an-linhas-header"><span>Linha</span><span>Odd justa</span><span>Situação</span></div>
@@ -2404,13 +2422,44 @@ Se não conseguir ler a odd ou os mercados no print, responda com {"erro": "moti
         ? `<div class="an-mercados-avaliados"><span class="an-alertas-title">Descartados</span><ul class="an-alertas">${a.descartados.map(d => `<li><strong>${escapeHtml(d.mercado || '—')}:</strong> ${escapeHtml(d.motivo || '')}</li>`).join('')}</ul></div>`
         : '';
 
+      const marketBadgesHtml = isBilhete
+        ? selecoes.map(s => `<div class="an-market-highlight">${escapeHtml(s.mercado || '—')}<span class="sep">·</span>Linha ${escapeHtml(s.linha_sugerida || '—')}${s.time_alvo ? `<span class="sep">·</span>${escapeHtml(s.time_alvo)}` : ''}</div>`).join('')
+        : `<div class="an-market-highlight">${escapeHtml(a.mercado || '—')}<span class="sep">·</span>Linha ${escapeHtml(a.linha_sugerida || '—')}${a.timeAlvo ? `<span class="sep">·</span>${escapeHtml(a.timeAlvo)}` : ''}</div>`;
+
+      const oddReferencia = isBilhete ? (a.odd_combinada || '1.50') : (a.odd_valor || '1.50');
+
+      const selecoesDetailHtml = isBilhete
+        ? selecoes.map((s, i) => `
+            <div class="an-selecao-card">
+              <div class="an-suggestion-top">
+                <div class="an-suggestion-market">Seleção ${i + 1} · ${escapeHtml(s.mercado || '—')}${s.time_alvo ? ` <span class="sep">·</span> ${escapeHtml(s.time_alvo)}` : ''}</div>
+                <div class="an-suggestion-pill">${escapeHtml(s.linha_sugerida || '—')}</div>
+              </div>
+              <div class="an-suggestion-stats">
+                <div class="stat-chip"><span class="stat-chip-label">Média observada</span><span class="stat-chip-value safe">${escapeHtml(s.media_observada || '—')}</span></div>
+                <div class="stat-chip"><span class="stat-chip-label">Odd justa</span><span class="stat-chip-value safe">${escapeHtml(s.odd_justa || '—')}</span></div>
+                ${s.probabilidade_estimada ? `<div class="stat-chip"><span class="stat-chip-label">Probabilidade</span><span class="stat-chip-value">${escapeHtml(s.probabilidade_estimada)}</span></div>` : ''}
+                ${s.amostra ? `<div class="stat-chip"><span class="stat-chip-label">Amostra</span><span class="stat-chip-value">${escapeHtml(s.amostra)}</span></div>` : ''}
+              </div>
+            </div>`).join('')
+        : `<div class="an-suggestion-stats" style="margin-bottom:12px;">
+              <div class="stat-chip"><span class="stat-chip-label">Média observada</span><span class="stat-chip-value safe">${escapeHtml(a.media_observada || '—')}</span></div>
+              <div class="stat-chip"><span class="stat-chip-label">Odd de valor</span><span class="stat-chip-value safe">${escapeHtml(a.odd_valor || '—')}</span></div>
+              ${a.probabilidade_estimada ? `<div class="stat-chip"><span class="stat-chip-label">Probabilidade estimada</span><span class="stat-chip-value">${escapeHtml(a.probabilidade_estimada)}</span></div>` : ''}
+              ${a.amostra ? `<div class="stat-chip"><span class="stat-chip-label">Amostra</span><span class="stat-chip-value">${escapeHtml(a.amostra)}</span></div>` : ''}
+            </div>`;
+
+      const probCombinadaHtml = (isBilhete && a.probabilidade_combinada)
+        ? `<div class="an-suggestion-stats" style="margin-bottom:12px;"><div class="stat-chip"><span class="stat-chip-label">Odd combinada</span><span class="stat-chip-value safe">${escapeHtml(a.odd_combinada || '—')}</span></div><div class="stat-chip"><span class="stat-chip-label">Probabilidade combinada</span><span class="stat-chip-value">${escapeHtml(a.probabilidade_combinada)}</span></div></div>`
+        : '';
+
       return `
         <div class="an-saved-item">
           <button type="button" class="an-saved-row" onclick="toggleAnaliseDetail('${a.id}')">
             <div class="an-saved-info">
               <div class="name"><span class="arrow">${isOpen ? '▾' : '▸'}</span> ${renderTeamsWithCrests(a.time)}</div>
               <div class="an-match-datetime">${dataHoraJogo ? escapeHtml(dataHoraJogo) : 'Data/horário não informado'}</div>
-              <div class="an-market-highlight">${escapeHtml(a.mercado || '—')}<span class="sep">·</span>Linha ${escapeHtml(a.linha_sugerida || '—')}${a.timeAlvo ? `<span class="sep">·</span>${escapeHtml(a.timeAlvo)}` : ''}</div>${oddBadgeHtml}
+              ${marketBadgesHtml}${oddBadgeHtml}
             </div>
           </button>
           <div class="an-saved-toolbar">
@@ -2419,12 +2468,8 @@ Se não conseguir ler a odd ou os mercados no print, responda com {"erro": "moti
             <button class="icon-btn" title="Excluir" onclick="deleteAnalise('${a.id}')">✕</button>
           </div>
           <div class="an-saved-detail" style="display:${isOpen ? 'block' : 'none'};">
-            <div class="an-suggestion-stats" style="margin-bottom:12px;">
-              <div class="stat-chip"><span class="stat-chip-label">Média observada</span><span class="stat-chip-value safe">${escapeHtml(a.media_observada || '—')}</span></div>
-              <div class="stat-chip"><span class="stat-chip-label">Odd de valor</span><span class="stat-chip-value safe">${escapeHtml(a.odd_valor || '—')}</span></div>
-              ${a.probabilidade_estimada ? `<div class="stat-chip"><span class="stat-chip-label">Probabilidade estimada</span><span class="stat-chip-value">${escapeHtml(a.probabilidade_estimada)}</span></div>` : ''}
-              ${a.amostra ? `<div class="stat-chip"><span class="stat-chip-label">Amostra</span><span class="stat-chip-value">${escapeHtml(a.amostra)}</span></div>` : ''}
-            </div>
+            ${probCombinadaHtml}
+            ${selecoesDetailHtml}
             ${tabelaLinhasHtml}
             ${a.justificativa ? `<p class="an-justificativa">${escapeHtml(a.justificativa)}</p>` : ''}
             ${descartadosHtml}
@@ -2432,10 +2477,10 @@ Se não conseguir ler a odd ou os mercados no print, responda com {"erro": "moti
             ${alertasHtml}
 
             <div class="an-check-box" style="margin-top:16px;">
-              <label>Confronto (times separados por "x") e time da linha (deixe em branco se a linha for do jogo todo)</label>
+              <label>Confronto (times separados por "x")${!isBilhete ? ' e time da linha (deixe em branco se a linha for do jogo todo)' : ''}</label>
               <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
                 <input type="text" id="an-edit-confronto-${a.id}" value="${a.time ? escapeHtml(a.time) : ''}" placeholder="Time A x Time B" style="max-width:220px;">
-                <input type="text" id="an-edit-timealvo-${a.id}" value="${a.timeAlvo ? escapeHtml(a.timeAlvo) : ''}" placeholder="Time da linha (opcional)" style="max-width:180px;">
+                ${!isBilhete ? `<input type="text" id="an-edit-timealvo-${a.id}" value="${a.timeAlvo ? escapeHtml(a.timeAlvo) : ''}" placeholder="Time da linha (opcional)" style="max-width:180px;">` : ''}
               </div>
             </div>
             <div class="an-check-box" style="margin-top:14px;">
@@ -2446,11 +2491,11 @@ Se não conseguir ler a odd ou os mercados no print, responda com {"erro": "moti
               </div>
             </div>
             <div class="an-check-box" style="margin-top:14px;">
-              <label>Melhor ODD Encontrada / casa de apostas (editar se encontrou melhor em outro lugar)</label>
+              <label>Melhor ODD Encontrada${isBilhete ? ' (do bilhete completo)' : ''} / casa de apostas (editar se encontrou melhor em outro lugar)</label>
               <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
                 <input type="text" inputmode="decimal" id="an-edit-odd-${a.id}" value="${a.oddVista != null ? String(a.oddVista).replace('.', ',') : ''}" placeholder="1,85" style="max-width:140px;">
                 <input type="text" id="an-edit-casa-${a.id}" list="an-casas-list" value="${a.casaAposta ? escapeHtml(a.casaAposta.nome) : ''}" placeholder="Casa de apostas" style="max-width:220px;">
-                <button type="button" class="primary" style="width:auto;padding:9px 16px;" onclick="updateAnaliseOdd('${a.id}', '${escapeHtml(String(a.odd_valor || '1.50'))}')">Salvar</button>
+                <button type="button" class="primary" style="width:auto;padding:9px 16px;" onclick="updateAnaliseOdd('${a.id}', '${escapeHtml(String(oddReferencia))}')">Salvar</button>
               </div>
               <div id="an-edit-result-${a.id}" style="margin-top:8px;font-size:12.5px;"></div>
             </div>
