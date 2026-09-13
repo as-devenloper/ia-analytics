@@ -1379,11 +1379,11 @@
   // cai num badge com as iniciais.
   // ---------------------------------------------------------------
   let teamCrestCache = {};
-  try{ teamCrestCache = JSON.parse(localStorage.getItem('teamCrestCacheV6') || '{}'); }catch(e){ teamCrestCache = {}; }
+  try{ teamCrestCache = JSON.parse(localStorage.getItem('teamCrestCacheV7') || '{}'); }catch(e){ teamCrestCache = {}; }
   const pendingCrestFetches = new Set();
 
   function saveCrestCache(){
-    try{ localStorage.setItem('teamCrestCacheV6', JSON.stringify(teamCrestCache)); }catch(e){}
+    try{ localStorage.setItem('teamCrestCacheV7', JSON.stringify(teamCrestCache)); }catch(e){}
   }
 
   function splitTeams(str){
@@ -1441,23 +1441,24 @@
         const enTitle = entity && entity.sitelinks && entity.sitelinks.enwiki && entity.sitelinks.enwiki.title;
 
         if(enTitle){
-          // Extrai o parâmetro de imagem direto do infobox (seção 0 do
-          // wikitext) — muito mais confiável do que listar imagens da
-          // página, que vêm em ordem alfabética e não por aparição.
-          const wtUrl = 'https://en.wikipedia.org/w/api.php?action=parse&page=' + encodeURIComponent(enTitle)
-            + '&prop=wikitext&section=0&format=json&origin=*';
-          const wtRes = await fetch(wtUrl);
-          const wtData = await wtRes.json();
-          const wikitext = wtData && wtData.parse && wtData.parse.wikitext && wtData.parse.wikitext['*'];
-          let filename = null;
-          if(wikitext){
-            const m = wikitext.match(/\|\s*(?:image|crest|logo)\s*=\s*(?:\[\[\s*(?:File|Image|Ficheiro|Arquivo)\s*:)?\s*([^\n|\]]+)/i);
-            if(m && m[1]) filename = m[1].trim();
+          // Pega a 1ª <img> do HTML já renderizado da seção 0 (o infobox).
+          // Isso reflete a ordem real de aparição na página — ao contrário
+          // da lista de imagens da API, que vem em ordem alfabética — e o
+          // escudo é sempre a primeira imagem do infobox.
+          const htmlUrl = 'https://en.wikipedia.org/w/api.php?action=parse&page=' + encodeURIComponent(enTitle)
+            + '&prop=text&section=0&format=json&origin=*';
+          const htmlRes = await fetch(htmlUrl);
+          const htmlData = await htmlRes.json();
+          const sectionHtml = htmlData && htmlData.parse && htmlData.parse.text && htmlData.parse.text['*'];
+          let imgSrc = null;
+          if(sectionHtml){
+            const m = sectionHtml.match(/<img[^>]+src="([^"]+)"/i);
+            if(m && m[1]) imgSrc = m[1];
           }
-          if(filename){
-            result = 'https://commons.wikimedia.org/wiki/Special:FilePath/' + encodeURIComponent(filename) + '?width=100';
+          if(imgSrc){
+            result = imgSrc.startsWith('//') ? ('https:' + imgSrc) : imgSrc;
           } else {
-            // Sem match no infobox — última tentativa via pageimages.
+            // Sem imagem no infobox — última tentativa via pageimages.
             const imgUrl = 'https://en.wikipedia.org/w/api.php?action=query&titles=' + encodeURIComponent(enTitle)
               + '&prop=pageimages&piprop=thumbnail&pithumbsize=100&format=json&origin=*';
             const imgRes = await fetch(imgUrl);
@@ -1937,8 +1938,10 @@ MOMENTO REAL DOS TIMES: se os dados mostrarem jogo a jogo (não só a média con
 
 Se a data e o horário de início da partida aparecerem nos dados (print ou texto extraído), inclua no formato "data_jogo": "dd/mm" e "hora_jogo": "HH:mm". Se não aparecerem, retorne esses dois campos como null — não invente.
 
+No campo "time", SEMPRE informe os dois times do confronto no formato "Time A x Time B" — mesmo quando a linha sugerida for de um mercado específico de só um dos lados (ex: cartões só do time da casa). Nesse caso, além dos dois times em "time", informe em "time_alvo" o nome exato do time ao qual a linha se refere. Se a linha for de um mercado do jogo todo (envolvendo os dois times, ex: escanteios totais do jogo), retorne "time_alvo": null.
+
 Responda APENAS com um objeto JSON, sem markdown, sem texto antes ou depois, exatamente neste formato:
-{"time": "...", "mercado": "...", "data_jogo": "dd/mm ou null", "hora_jogo": "HH:mm ou null", "linha_sugerida": "...", "media_observada": "ex: 5.8 casa (Flu) + 10.4 fora (Platense) → projeção 9.7", "odd_valor": "odd justa calculada da linha escolhida, ex: 1.65", "probabilidade_estimada": "ex: 61% (já descontada)", "amostra": "ex: 5 jogos cada lado, CV 0.31", "tabela_linhas": [{"linha": "ex: Mais de 7.5", "odd_justa": "1.35", "situacao": "positivo mas odd baixa"}, {"linha": "ex: Mais de 8.5", "odd_justa": "1.61", "situacao": "melhor relação"}, {"linha": "ex: Mais de 9.5", "odd_justa": "1.85", "situacao": "valor alto, risco maior"}], "justificativa": "no máximo 4 frases: a lógica do cálculo aditivo, o desconto aplicado, e por que essa linha (não outra) tem a melhor relação risco/retorno", "descartados": [{"mercado": "ex: Gols", "motivo": "frase curta com o número que descarta"}], "mercados_avaliados": ["lista curta de todos os mercados vistos"], "alertas": ["no máximo 3 itens curtos"]}
+{"time": "Time A x Time B", "time_alvo": "nome do time ou null", "mercado": "...", "data_jogo": "dd/mm ou null", "hora_jogo": "HH:mm ou null", "linha_sugerida": "...", "media_observada": "ex: 5.8 casa (Flu) + 10.4 fora (Platense) → projeção 9.7", "odd_valor": "odd justa calculada da linha escolhida, ex: 1.65", "probabilidade_estimada": "ex: 61% (já descontada)", "amostra": "ex: 5 jogos cada lado, CV 0.31", "tabela_linhas": [{"linha": "ex: Mais de 7.5", "odd_justa": "1.35", "situacao": "positivo mas odd baixa"}, {"linha": "ex: Mais de 8.5", "odd_justa": "1.61", "situacao": "melhor relação"}, {"linha": "ex: Mais de 9.5", "odd_justa": "1.85", "situacao": "valor alto, risco maior"}], "justificativa": "no máximo 4 frases: a lógica do cálculo aditivo, o desconto aplicado, e por que essa linha (não outra) tem a melhor relação risco/retorno", "descartados": [{"mercado": "ex: Gols", "motivo": "frase curta com o número que descarta"}], "mercados_avaliados": ["lista curta de todos os mercados vistos"], "alertas": ["no máximo 3 itens curtos"]}
 
 Seja objetivo em todos os campos — respostas longas correm risco de cortar o JSON. O JSON precisa ser válido: tudo em uma linha só, sem quebra de linha dentro dos textos. Se nenhuma linha passar do piso de 1.50 depois do desconto, ou os dados forem insuficientes, responda com {"erro": "motivo em uma frase"} em vez do formato acima.`;
 
@@ -2009,6 +2012,7 @@ Seja objetivo em todos os campos — respostas longas correm risco de cortar o J
       }
       const docRef = await analisesRef.add({
         time: p.time || null,
+        timeAlvo: p.time_alvo || null,
         mercado: p.mercado || null,
         dataJogo: p.data_jogo || null,
         horaJogo: p.hora_jogo || null,
@@ -2296,6 +2300,8 @@ Se não conseguir ler a odd ou os mercados no print, responda com {"erro": "moti
     const casaInput = document.getElementById('an-edit-casa-' + id);
     const dataInput = document.getElementById('an-edit-data-' + id);
     const horaInput = document.getElementById('an-edit-hora-' + id);
+    const confrontoInput = document.getElementById('an-edit-confronto-' + id);
+    const timeAlvoInput = document.getElementById('an-edit-timealvo-' + id);
     const resultEl = document.getElementById('an-edit-result-' + id);
     const oddVista = parseFloat(oddInput.value.replace(',', '.'));
     if(isNaN(oddVista)){
@@ -2311,6 +2317,8 @@ Se não conseguir ler a odd ou os mercados no print, responda com {"erro": "moti
     const update = { oddVista, temValor };
     if(dataInput) update.dataJogo = dataInput.value.trim() || null;
     if(horaInput) update.horaJogo = horaInput.value.trim() || null;
+    if(confrontoInput) update.time = confrontoInput.value.trim() || null;
+    if(timeAlvoInput) update.timeAlvo = timeAlvoInput.value.trim() || null;
     if(casaEncontrada) update.casaAposta = casaEncontrada;
     else if(!casaNome) update.casaAposta = firebase.firestore.FieldValue.delete();
 
@@ -2402,7 +2410,7 @@ Se não conseguir ler a odd ou os mercados no print, responda com {"erro": "moti
             <div class="an-saved-info">
               <div class="name"><span class="arrow">${isOpen ? '▾' : '▸'}</span> ${renderTeamsWithCrests(a.time)}</div>
               <div class="an-match-datetime">${dataHoraJogo ? escapeHtml(dataHoraJogo) : 'Data/horário não informado'}</div>
-              <div class="an-market-highlight">${escapeHtml(a.mercado || '—')}<span class="sep">·</span>Linha ${escapeHtml(a.linha_sugerida || '—')}</div>${oddBadgeHtml}
+              <div class="an-market-highlight">${escapeHtml(a.mercado || '—')}<span class="sep">·</span>Linha ${escapeHtml(a.linha_sugerida || '—')}${a.timeAlvo ? `<span class="sep">·</span>${escapeHtml(a.timeAlvo)}` : ''}</div>${oddBadgeHtml}
             </div>
           </button>
           <div class="an-saved-toolbar">
@@ -2424,6 +2432,13 @@ Se não conseguir ler a odd ou os mercados no print, responda com {"erro": "moti
             ${alertasHtml}
 
             <div class="an-check-box" style="margin-top:16px;">
+              <label>Confronto (times separados por "x") e time da linha (deixe em branco se a linha for do jogo todo)</label>
+              <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
+                <input type="text" id="an-edit-confronto-${a.id}" value="${a.time ? escapeHtml(a.time) : ''}" placeholder="Time A x Time B" style="max-width:220px;">
+                <input type="text" id="an-edit-timealvo-${a.id}" value="${a.timeAlvo ? escapeHtml(a.timeAlvo) : ''}" placeholder="Time da linha (opcional)" style="max-width:180px;">
+              </div>
+            </div>
+            <div class="an-check-box" style="margin-top:14px;">
               <label>Data e horário da partida</label>
               <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
                 <input type="text" id="an-edit-data-${a.id}" value="${a.dataJogo ? escapeHtml(a.dataJogo) : ''}" placeholder="11/09" style="max-width:120px;">
