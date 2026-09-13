@@ -1389,11 +1389,11 @@
   // cai num badge com as iniciais.
   // ---------------------------------------------------------------
   let teamCrestCache = {};
-  try{ teamCrestCache = JSON.parse(localStorage.getItem('teamCrestCacheV7') || '{}'); }catch(e){ teamCrestCache = {}; }
+  try{ teamCrestCache = JSON.parse(localStorage.getItem('teamCrestCacheV8') || '{}'); }catch(e){ teamCrestCache = {}; }
   const pendingCrestFetches = new Set();
 
   function saveCrestCache(){
-    try{ localStorage.setItem('teamCrestCacheV7', JSON.stringify(teamCrestCache)); }catch(e){}
+    try{ localStorage.setItem('teamCrestCacheV8', JSON.stringify(teamCrestCache)); }catch(e){}
   }
 
   function splitTeams(str){
@@ -1433,19 +1433,23 @@
     const key = name.trim().toLowerCase();
     if(teamCrestCache.hasOwnProperty(key)) return teamCrestCache[key];
     let result = null;
+    let confirmed = false; // só vira true quando a API respondeu de verdade
     try{
       const searchUrl = 'https://www.wikidata.org/w/api.php?action=wbsearchentities&search='
         + encodeURIComponent(name) + '&language=en&format=json&origin=*&limit=10&type=item';
       const searchRes = await fetch(searchUrl);
+      if(!searchRes.ok) throw new Error('search http ' + searchRes.status);
       const searchData = await searchRes.json();
       const candidates = (searchData && searchData.search) || [];
       const match = candidates.find(c => isClubDescription(c.description));
+      confirmed = true; // busca respondeu — se não achar nada daqui pra frente, é um "não encontrado" real
 
       if(match){
         const qid = match.id;
         const entUrl = 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=' + qid
           + '&props=sitelinks&sitefilter=enwiki&format=json&origin=*';
         const entRes = await fetch(entUrl);
+        if(!entRes.ok) throw new Error('entities http ' + entRes.status);
         const entData = await entRes.json();
         const entity = entData && entData.entities && entData.entities[qid];
         const enTitle = entity && entity.sitelinks && entity.sitelinks.enwiki && entity.sitelinks.enwiki.title;
@@ -1458,6 +1462,7 @@
           const htmlUrl = 'https://en.wikipedia.org/w/api.php?action=parse&page=' + encodeURIComponent(enTitle)
             + '&prop=text&section=0&format=json&origin=*';
           const htmlRes = await fetch(htmlUrl);
+          if(!htmlRes.ok) throw new Error('parse http ' + htmlRes.status);
           const htmlData = await htmlRes.json();
           const sectionHtml = htmlData && htmlData.parse && htmlData.parse.text && htmlData.parse.text['*'];
           let imgSrc = null;
@@ -1472,38 +1477,52 @@
             const imgUrl = 'https://en.wikipedia.org/w/api.php?action=query&titles=' + encodeURIComponent(enTitle)
               + '&prop=pageimages&piprop=thumbnail&pithumbsize=100&format=json&origin=*';
             const imgRes = await fetch(imgUrl);
-            const imgData = await imgRes.json();
-            const pages = imgData && imgData.query && imgData.query.pages;
-            if(pages){
-              const first = Object.values(pages)[0];
-              if(first && first.thumbnail && first.thumbnail.source) result = first.thumbnail.source;
+            if(imgRes.ok){
+              const imgData = await imgRes.json();
+              const pages = imgData && imgData.query && imgData.query.pages;
+              if(pages){
+                const first = Object.values(pages)[0];
+                if(first && first.thumbnail && first.thumbnail.source) result = first.thumbnail.source;
+              }
             }
           }
         }
       }
     } catch(e){
-      result = null;
+      // Erro de rede/limite de taxa — NÃO marca como confirmado, pra
+      // tentar de novo depois em vez de travar num "não encontrado" falso.
+      confirmed = false;
     }
-    teamCrestCache[key] = result;
-    saveCrestCache();
-    return teamCrestCache[key];
+    if(confirmed){
+      teamCrestCache[key] = result;
+      saveCrestCache();
+    }
+    return result;
   }
 
+  // Fila simples: busca um time de cada vez, com um pequeno intervalo,
+  // em vez de disparar tudo em paralelo (o que costumava esbarrar em
+  // limite de taxa das APIs e deixar times aleatórios sem escudo).
+  let crestQueue = Promise.resolve();
   function queueCrestFetch(name, slotId){
     const key = name.trim().toLowerCase();
     if(pendingCrestFetches.has(key)) return;
     pendingCrestFetches.add(key);
-    fetchTeamCrest(name).then((url) => {
-      pendingCrestFetches.delete(key);
-      const el = document.getElementById(slotId);
-      if(!el || !url) return;
-      const img = document.createElement('img');
-      img.className = 'team-crest';
-      img.alt = '';
-      img.dataset.team = name;
-      img.src = url;
-      el.replaceWith(img);
-    });
+    crestQueue = crestQueue
+      .then(() => new Promise(resolve => setTimeout(resolve, 180)))
+      .then(() => fetchTeamCrest(name))
+      .then((url) => {
+        pendingCrestFetches.delete(key);
+        const el = document.getElementById(slotId);
+        if(!el || !url) return;
+        const img = document.createElement('img');
+        img.className = 'team-crest';
+        img.alt = '';
+        img.dataset.team = name;
+        img.src = url;
+        el.replaceWith(img);
+      })
+      .catch(() => { pendingCrestFetches.delete(key); });
   }
 
   // Time com escudo já conhecido é renderizado direto; senão, mostra
