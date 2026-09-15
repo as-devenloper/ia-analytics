@@ -1957,7 +1957,7 @@ SOBRE O TEXTO EXTRAÍDO DA PÁGINA: trechos entre ** ** (ex: **6.6**) estavam em
 QUANDO HOUVER UMA SEQUÊNCIA JOGO A JOGO NUMA LINHA (vários números seguidos, geralmente terminando numa coluna de CV): os jogos MAIS RECENTES são os números posicionados mais PRÓXIMOS/ADJACENTES à coluna de CV daquela linha; os números mais distantes do CV, no início da sequência, são os jogos MAIS ANTIGOS. Nunca inverta essa leitura — usar os jogos antigos como se fossem os recentes (ou vice-versa) invalida a tendência e a amostra. Ao comentar "momento real do time" ou dar peso a jogos recentes, confirme visualmente quais números realmente estão do lado do CV antes de citá-los.
 
 MÉTODO DE PROJEÇÃO (siga essa ordem):
-1. NUNCA use o mercado de ESCANTEIOS — está fora de cogitação, mesmo que pareça o mais estável ou óbvio nos dados. Avalie os outros mercados disponíveis nos dados pra ambos os times (gols, cartões, faltas, finalizações, finalizações no alvo, posse, passes, xG, desarmes, resultado/chance dupla — os que tiverem dado suficiente), calculando a média/expectativa combinada e o CV de cada um antes de decidir qual usar.
+1. Avalie TODOS os mercados disponíveis nos dados pra ambos os times (escanteios, gols, cartões, faltas, finalizações, finalizações no alvo, posse, passes, xG, desarmes, resultado/chance dupla — os que tiverem dado suficiente), calculando a média/expectativa combinada e o CV de cada um antes de decidir qual usar. ATENÇÃO: escanteios e cartões costumam ter CV mais baixo que faltas/finalizações em muitos jogos — isso pode fazer esses mercados "vencerem" com facilidade só por hábito. Menor CV sozinho não é motivo suficiente pra escolher um mercado; compare os números de verdade entre todos antes de decidir, e não deixe nenhum mercado virar escolha automática.
 2. Escolha UMA ÚNICA aposta (não bilhete/múltipla) — o mercado/linha com a melhor relação risco-retorno entre os avaliados.
 3. Projete a expectativa do jogo pra esse mercado SOMANDO o recorte específico de cada time quando disponível — ex: média do mandante EM CASA + média do visitante FORA (não a média geral de cada time, que mistura jogos em casa e fora).
 4. A LINHA SUGERIDA TEM QUE SER UMA LINHA REAL, do jeito que casas de apostas costumam oferecer nesse mercado — números redondos em ".5" nos incrementos usuais do mercado (ex: cartões/gols costumam ter linhas de 1 em 1: 2.5, 3.5, 4.5...; faltas e finalizações às vezes vêm em incrementos maiores, ex: 19.5, 21.5, 24.5). NUNCA invente uma linha "seguríssima" fora do padrão do mercado (tipo "Mais de 8.5" faltas quando a casa só oferece a partir de 19.5) só pra parecer mais conservadora — isso não é uma aposta que existe de verdade. Baseie-se no padrão de linhas do próprio mercado analisado; se os dados não deixarem claro quais linhas existem, use o incremento mais comum daquele mercado (a cada 1.0, com ".5" no meio) partindo de perto da expectativa calculada.
@@ -1974,7 +1974,7 @@ Se a data e o horário de início da partida aparecerem nos dados (print ou text
 No campo "time", SEMPRE informe os dois times do confronto no formato "Time A x Time B" — mesmo quando a linha sugerida for de um mercado específico de só um dos lados (ex: cartões só do time da casa). Nesse caso, além dos dois times em "time", informe em "time_alvo" o nome exato do time ao qual a linha se refere. Se a linha for de um mercado do jogo todo (envolvendo os dois times), retorne "time_alvo": null.
 
 Responda APENAS com um objeto JSON, sem markdown, sem texto antes ou depois, exatamente neste formato:
-{"time": "Time A x Time B", "time_alvo": "nome do time ou null", "mercado": "...", "data_jogo": "dd/mm ou null", "hora_jogo": "HH:mm ou null", "linha_sugerida": "...", "media_observada": "ex: 5.8 casa (Flu) + 10.4 fora (Platense) → projeção 9.7", "odd_valor": "odd justa calculada da linha escolhida, ex: 1.65", "probabilidade_estimada": "ex: 61% (já descontada)", "amostra": "ex: 5 jogos cada lado, CV 0.31", "tabela_linhas": [{"linha": "ex: Mais de 7.5", "odd_justa": "1.35", "situacao": "positivo mas odd baixa"}, {"linha": "ex: Mais de 8.5", "odd_justa": "1.61", "situacao": "melhor relação"}, {"linha": "ex: Mais de 9.5", "odd_justa": "1.85", "situacao": "valor alto, risco maior"}], "justificativa": "2-4 frases diretas e específicas DESSES DOIS TIMES (não genéricas) — combine a lógica do cálculo (a soma, o desconto aplicado) com o contexto real do confronto (competição, estilo de jogo, rivalidade, mando, momento). Escreva como um analista experiente explicando a aposta pra alguém — direto e confiante, sem linguagem hesitante ou de relatório", "descartados": [{"mercado": "ex: Gols", "motivo": "frase curta com o número que descarta"}], "mercados_avaliados": ["lista curta de todos os mercados vistos (sem contar escanteios)"], "alertas": ["no máximo 3 itens curtos"]}
+{"time": "Time A x Time B", "time_alvo": "nome do time ou null", "mercado": "...", "data_jogo": "dd/mm ou null", "hora_jogo": "HH:mm ou null", "linha_sugerida": "...", "media_observada": "ex: 5.8 casa (Flu) + 10.4 fora (Platense) → projeção 9.7", "odd_valor": "odd justa calculada da linha escolhida, ex: 1.65", "probabilidade_estimada": "ex: 61% (já descontada)", "amostra": "ex: 5 jogos cada lado, CV 0.31", "tabela_linhas": [{"linha": "ex: Mais de 7.5", "odd_justa": "1.35", "situacao": "positivo mas odd baixa"}, {"linha": "ex: Mais de 8.5", "odd_justa": "1.61", "situacao": "melhor relação"}, {"linha": "ex: Mais de 9.5", "odd_justa": "1.85", "situacao": "valor alto, risco maior"}], "justificativa": "2-4 frases diretas e específicas DESSES DOIS TIMES (não genéricas) — combine a lógica do cálculo (a soma, o desconto aplicado) com o contexto real do confronto (competição, estilo de jogo, rivalidade, mando, momento). Escreva como um analista experiente explicando a aposta pra alguém — direto e confiante, sem linguagem hesitante ou de relatório", "descartados": [{"mercado": "ex: Gols", "motivo": "frase curta com o número que descarta"}], "mercados_avaliados": ["lista curta de todos os mercados vistos"], "alertas": ["no máximo 3 itens curtos"]}
 
 Seja objetivo em todos os campos — respostas longas correm risco de cortar o JSON. O JSON precisa ser válido: tudo em uma linha só, sem quebra de linha dentro dos textos. Se nenhuma linha real do mercado passar do piso de 1.50 depois do desconto, ou os dados forem insuficientes, responda com {"erro": "motivo em uma frase"} em vez do formato acima.`;
 
@@ -1988,9 +1988,20 @@ Seja objetivo em todos os campos — respostas longas correm risco de cortar o J
     anAnalyzeBtn.innerHTML = `<span class="spinner small"></span> Analisando…`;
     anResult.innerHTML = `<div class="loading-state"><span class="spinner"></span></div>`;
 
+    // Mostra pra IA quais mercados ela escolheu nas últimas análises, pra
+    // evitar repetir sempre o mesmo "padrão seguro" (antes era escanteios
+    // toda hora, depois virou cartões toda hora).
+    const recentMarkets = (analisesAll || [])
+      .slice(0, 6)
+      .map(a => a.mercado || (a.selecoes && a.selecoes[0] && a.selecoes[0].mercado))
+      .filter(Boolean);
+    const recentMarketsNote = recentMarkets.length
+      ? `\n\nATENÇÃO — VIÉS DE REPETIÇÃO: os últimos mercados que você mesma escolheu em análises anteriores foram, do mais recente pro mais antigo: ${recentMarkets.join(', ')}. Se esse mesmo mercado aparecer repetido 3+ vezes seguidas aí, é sinal de que você está caindo num "padrão seguro" em vez de comparar de verdade. Pra ESTE jogo, faça a comparação numérica (média e CV) entre TODOS os mercados com dado suficiente igualzinho manda o método abaixo, e só repita o mercado mais recente se ele genuinamente vencer essa comparação — não porque é o hábito.`
+      : '';
+
     const promptFinal = anHtmlText
-      ? `${AN_PROMPT}\n\n--- DADOS EXTRAÍDOS DA PÁGINA DO TIP SCORE (texto, mais confiável que imagem) ---\n${anHtmlText}`
-      : AN_PROMPT;
+      ? `${AN_PROMPT}${recentMarketsNote}\n\n--- DADOS EXTRAÍDOS DA PÁGINA DO TIP SCORE (texto, mais confiável que imagem) ---\n${anHtmlText}`
+      : `${AN_PROMPT}${recentMarketsNote}`;
 
     try{
       const response = await fetch(ANALISE_FUNCTION_URL, {
