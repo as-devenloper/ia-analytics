@@ -1963,7 +1963,7 @@ MÉTODO DE PROJEÇÃO (siga essa ordem):
 4. A LINHA SUGERIDA TEM QUE SER UMA LINHA REAL, do jeito que casas de apostas costumam oferecer nesse mercado — números redondos em ".5" nos incrementos usuais do mercado (ex: cartões/gols costumam ter linhas de 1 em 1: 2.5, 3.5, 4.5...; faltas e finalizações às vezes vêm em incrementos maiores, ex: 19.5, 21.5, 24.5). NUNCA invente uma linha "seguríssima" fora do padrão do mercado (tipo "Mais de 8.5" faltas quando a casa só oferece a partir de 19.5) só pra parecer mais conservadora — isso não é uma aposta que existe de verdade. Baseie-se no padrão de linhas do próprio mercado analisado; se os dados não deixarem claro quais linhas existem, use o incremento mais comum daquele mercado (a cada 1.0, com ".5" no meio) partindo de perto da expectativa calculada.
 5. A partir dessa expectativa, monte uma pequena tabela com 2 a 3 linhas de mercado reais e próximas (uma abaixo da expectativa, uma nela, uma acima), calculando a odd justa de cada uma (baseada na probabilidade estimada de passar daquela linha, JÁ com o desconto do item 6). Anote pra cada linha se tem valor, valor baixo, ou risco maior — a linha escolhida deve ser a de MELHOR relação risco/retorno, não necessariamente a de maior valor bruto (uma margem de segurança maior costuma valer mais que um pouco mais de odd).
 6. SEJA CONSERVADOR NA PROBABILIDADE: amostras de 5-10 jogos são pequenas. "Bateu em 9 de 10" NÃO é 90% real — é excesso de confiança. Puxe a taxa bruta em direção a 50%, tipicamente descontando 15-25 pontos percentuais (mais desconto quanto menor a amostra ou maior o CV). NUNCA estime acima de 80%, mesmo com amostra "perfeita".
-7. Considere fatores de contexto que ajudam a explicar ou reforçar a direção (favoritismo/disputa esperada, estilo de jogo, mando de campo, tendência recente jogo a jogo) — mas como reforço da leitura numérica, não como substituto dela.
+7. USE CONHECIMENTO REAL sobre os times e a competição pra enriquecer a leitura — não fique só nos números. Considere, quando fizer sentido pro jogo em questão: a fase/importância da competição (mata-mata decisivo, clássico ou jogo de rivalidade tende a elevar faltas/cartões/duelos físicos; jogo morno de meio de tabela tende a ser mais fraco nesses mercados), o estilo de jogo conhecido de cada time (time mais físico/agressivo comete e sofre mais faltas; time ofensivo finaliza mais; time cauteloso fora de casa joga mais retraído), e desfalques ou contexto relevante se aparecerem nos dados. Isso é reforço da leitura numérica, nunca substituto dela — a decisão final ainda depende da média e do CV — mas escreva sobre isso de forma DIRETA e ESPECÍFICA desses dois times, não genérica.
 8. Só sugira se pelo menos DOIS sinais independentes apontarem na mesma direção. Em "descartados", registre no MÁXIMO 4 mercados que NÃO foram escolhidos (os mais relevantes), cada um com número real (expectativa e/ou CV) em UMA frase curta (até ~12 palavras), nunca um parágrafo.
 9. Depois de tudo, se a odd de valor da melhor linha ficar abaixo do piso de 1.50, ou se os sinais forem fracos/conflitantes, ou os dados forem insuficientes: responda com erro em vez de forçar uma sugestão. Prefira não sugerir a sugerir mal.
 
@@ -1974,7 +1974,7 @@ Se a data e o horário de início da partida aparecerem nos dados (print ou text
 No campo "time", SEMPRE informe os dois times do confronto no formato "Time A x Time B" — mesmo quando a linha sugerida for de um mercado específico de só um dos lados (ex: cartões só do time da casa). Nesse caso, além dos dois times em "time", informe em "time_alvo" o nome exato do time ao qual a linha se refere. Se a linha for de um mercado do jogo todo (envolvendo os dois times), retorne "time_alvo": null.
 
 Responda APENAS com um objeto JSON, sem markdown, sem texto antes ou depois, exatamente neste formato:
-{"time": "Time A x Time B", "time_alvo": "nome do time ou null", "mercado": "...", "data_jogo": "dd/mm ou null", "hora_jogo": "HH:mm ou null", "linha_sugerida": "...", "media_observada": "ex: 5.8 casa (Flu) + 10.4 fora (Platense) → projeção 9.7", "odd_valor": "odd justa calculada da linha escolhida, ex: 1.65", "probabilidade_estimada": "ex: 61% (já descontada)", "amostra": "ex: 5 jogos cada lado, CV 0.31", "tabela_linhas": [{"linha": "ex: Mais de 7.5", "odd_justa": "1.35", "situacao": "positivo mas odd baixa"}, {"linha": "ex: Mais de 8.5", "odd_justa": "1.61", "situacao": "melhor relação"}, {"linha": "ex: Mais de 9.5", "odd_justa": "1.85", "situacao": "valor alto, risco maior"}], "justificativa": "no máximo 4 frases: a lógica do cálculo aditivo, o desconto aplicado, e por que essa linha (não outra) tem a melhor relação risco/retorno", "descartados": [{"mercado": "ex: Gols", "motivo": "frase curta com o número que descarta"}], "mercados_avaliados": ["lista curta de todos os mercados vistos (sem contar escanteios)"], "alertas": ["no máximo 3 itens curtos"]}
+{"time": "Time A x Time B", "time_alvo": "nome do time ou null", "mercado": "...", "data_jogo": "dd/mm ou null", "hora_jogo": "HH:mm ou null", "linha_sugerida": "...", "media_observada": "ex: 5.8 casa (Flu) + 10.4 fora (Platense) → projeção 9.7", "odd_valor": "odd justa calculada da linha escolhida, ex: 1.65", "probabilidade_estimada": "ex: 61% (já descontada)", "amostra": "ex: 5 jogos cada lado, CV 0.31", "tabela_linhas": [{"linha": "ex: Mais de 7.5", "odd_justa": "1.35", "situacao": "positivo mas odd baixa"}, {"linha": "ex: Mais de 8.5", "odd_justa": "1.61", "situacao": "melhor relação"}, {"linha": "ex: Mais de 9.5", "odd_justa": "1.85", "situacao": "valor alto, risco maior"}], "justificativa": "2-4 frases diretas e específicas DESSES DOIS TIMES (não genéricas) — combine a lógica do cálculo (a soma, o desconto aplicado) com o contexto real do confronto (competição, estilo de jogo, rivalidade, mando, momento). Escreva como um analista experiente explicando a aposta pra alguém — direto e confiante, sem linguagem hesitante ou de relatório", "descartados": [{"mercado": "ex: Gols", "motivo": "frase curta com o número que descarta"}], "mercados_avaliados": ["lista curta de todos os mercados vistos (sem contar escanteios)"], "alertas": ["no máximo 3 itens curtos"]}
 
 Seja objetivo em todos os campos — respostas longas correm risco de cortar o JSON. O JSON precisa ser válido: tudo em uma linha só, sem quebra de linha dentro dos textos. Se nenhuma linha real do mercado passar do piso de 1.50 depois do desconto, ou os dados forem insuficientes, responda com {"erro": "motivo em uma frase"} em vez do formato acima.`;
 
@@ -2384,6 +2384,8 @@ Se não conseguir ler a odd ou os mercados no print, responda com {"erro": "moti
     const taxaAcerto = settled ? Math.round((green / settled) * 100) : 0;
     const taxaErro = settled ? Math.round((red / settled) * 100) : 0;
     const gastoTotal = analisesAll.reduce((sum, a) => sum + (a.custoUsd || 0), 0);
+    const comCusto = analisesAll.filter(a => a.custoUsd != null).length;
+    const gastoMedio = comCusto ? gastoTotal / comCusto : 0;
     summary.innerHTML = `
       <div class="profit-card"><span class="num">${total}</span><span class="label">entradas no geral</span></div>
       <div class="profit-card"><span class="num safe">${green}</span><span class="label">green</span></div>
@@ -2391,6 +2393,7 @@ Se não conseguir ler a odd ou os mercados no print, responda com {"erro": "moti
       <div class="profit-card"><span class="num safe">${taxaAcerto}%</span><span class="label">média de acertos</span></div>
       <div class="profit-card"><span class="num warn">${taxaErro}%</span><span class="label">média de erros</span></div>
       <div class="profit-card"><span class="num">~US$ ${gastoTotal.toFixed(4)}</span><span class="label">gasto acumulado (estimado)</span></div>
+      <div class="profit-card"><span class="num">~US$ ${gastoMedio.toFixed(4)}</span><span class="label">média de gasto por análise</span></div>
     `;
   }
 
@@ -2491,6 +2494,7 @@ Se não conseguir ler a odd ou os mercados no print, responda com {"erro": "moti
             ${selecoesDetailHtml}
             ${tabelaLinhasHtml}
             ${a.justificativa ? `<p class="an-justificativa">${escapeHtml(a.justificativa)}</p>` : ''}
+            ${a.custoUsd != null ? `<div class="an-custo-box" style="margin-top:0;padding-top:0;border-top:none;">Custo estimado desta análise: <strong>~US$ ${Number(a.custoUsd).toFixed(4)}</strong></div>` : ''}
             ${descartadosHtml}
             ${mercadosHtml}
             ${alertasHtml}
