@@ -1837,21 +1837,6 @@
     }
   }
 
-  async function updateManualTotalJogo(id){
-    const input = document.getElementById('man-edit-total-' + id);
-    const resultEl = document.getElementById('man-edit-total-result-' + id);
-    const val = parseMaskedVal(input);
-    try{
-      await manuaisRef.doc(id).update({ totalJogo: isNaN(val) ? null : val });
-      resultEl.style.color = 'var(--safe)';
-      resultEl.textContent = '✓ Salvo.';
-    } catch(err){
-      console.error(err);
-      resultEl.style.color = 'var(--warn)';
-      resultEl.textContent = 'Não foi possível salvar.';
-    }
-  }
-
   function renderManuaisStats(){
     const summary = document.getElementById('man-stats-summary');
     const total = manuaisAll.length;
@@ -1869,6 +1854,60 @@
     `;
   }
 
+  let expandedManualId = null;
+  function toggleManualDetail(id){
+    expandedManualId = (expandedManualId === id) ? null : id;
+    renderManuaisSalvas();
+  }
+
+  async function updateManualEntry(id){
+    const resultEl = document.getElementById('man-edit-result-' + id);
+    const time = document.getElementById('man-edit-time-' + id).value.trim();
+    const oddVitoria = parseMaskedVal(document.getElementById('man-edit-odd-vitoria-' + id));
+    const mando = document.getElementById('man-edit-mando-' + id).value;
+    const chutes = parseMaskedVal(document.getElementById('man-edit-chutes-' + id));
+    const chutesGol = parseMaskedVal(document.getElementById('man-edit-chutes-gol-' + id));
+    const linhaMercado = parseMaskedVal(document.getElementById('man-edit-linha-' + id));
+    const odd = parseMaskedVal(document.getElementById('man-edit-odd-' + id));
+    const totalJogo = parseMaskedVal(document.getElementById('man-edit-total-' + id));
+    const casaNome = document.getElementById('man-edit-casa-' + id).value.trim();
+
+    if(!time || isNaN(chutes) || isNaN(chutesGol)){
+      resultEl.style.color = 'var(--warn)';
+      resultEl.textContent = 'Preencha pelo menos o time, a média de chutes e a média de chutes ao gol.';
+      return;
+    }
+    const soma = chutes + chutesGol;
+    const margem = !isNaN(linhaMercado) ? (soma - linhaMercado) : null;
+    const casaEncontrada = BOOKMAKERS.find(b => b.nome.toLowerCase() === casaNome.toLowerCase());
+
+    const update = {
+      time,
+      oddVitoria: isNaN(oddVitoria) ? null : oddVitoria,
+      mando,
+      mediaChutes: chutes,
+      mediaChutesGol: chutesGol,
+      soma,
+      linhaMercado: isNaN(linhaMercado) ? null : linhaMercado,
+      margemSeguranca: margem,
+      odd: isNaN(odd) ? null : odd,
+      totalJogo: isNaN(totalJogo) ? null : totalJogo
+    };
+    if(casaEncontrada) update.casaAposta = casaEncontrada;
+    else if(casaNome) update.casaAposta = { nome: casaNome, dominio: '' };
+    else update.casaAposta = firebase.firestore.FieldValue.delete();
+
+    try{
+      await manuaisRef.doc(id).update(update);
+      resultEl.style.color = 'var(--safe)';
+      resultEl.textContent = '✓ Atualizado.';
+    } catch(err){
+      console.error(err);
+      resultEl.style.color = 'var(--warn)';
+      resultEl.textContent = 'Não foi possível salvar. Confira sua conexão.';
+    }
+  }
+
   function renderManuaisSalvas(){
     renderManuaisStats();
     const container = document.getElementById('man-saved-container');
@@ -1877,6 +1916,7 @@
       return;
     }
     container.innerHTML = manuaisAll.map(m => {
+      const isOpen = expandedManualId === m.id;
       const resultado = m.resultado || 'pendente';
       let resultadoHtml;
       if(resultado === 'pendente'){
@@ -1894,32 +1934,86 @@
       const linhaNum = m.linhaMercado != null && !isNaN(Number(m.linhaMercado)) ? Number(m.linhaMercado).toFixed(1) : null;
       return `
         <div class="an-saved-item">
-          <div class="an-saved-row" style="cursor:default;">
+          <button type="button" class="an-saved-row" onclick="toggleManualDetail('${m.id}')">
             <div class="an-saved-info">
-              <div class="name"><span class="arrow">▸</span> ${escapeHtml(m.time || '—')}${m.mando ? ` <span class="sep">·</span> ${escapeHtml(m.mando)}` : ''}${m.oddVitoria != null ? ` <span class="sep">·</span> ODD Vitória ${Number(m.oddVitoria).toFixed(2)}` : ''}</div>
-              <div class="an-market-highlight">Chutes ${escapeHtml(String(m.mediaChutes ?? '—'))}<span class="sep">·</span>Chutes ao gol ${escapeHtml(String(m.mediaChutesGol ?? '—'))}<span class="sep">·</span>Soma ${soma}${linhaNum != null ? `<span class="sep">·</span>Linha ${linhaNum}` : (m.linhaMercado ? `<span class="sep">·</span>${escapeHtml(m.linhaMercado)}` : '')}${m.margemSeguranca != null ? `<span class="sep">·</span>Margem ${margem}` : ''}</div>
+              <div class="name"><span class="arrow">${isOpen ? '▾' : '▸'}</span> ${escapeHtml(m.time || '—')}${m.mando ? ` <span class="sep">·</span> ${escapeHtml(m.mando)}` : ''}${m.oddVitoria != null ? ` <span class="sep">·</span> ODD Vitória ${Number(m.oddVitoria).toFixed(2)}` : ''}</div>
+              <div class="an-market-highlight">Chutes ${escapeHtml(String(m.mediaChutes ?? '—'))}<span class="sep">·</span>Chutes ao gol ${escapeHtml(String(m.mediaChutesGol ?? '—'))}<span class="sep">·</span>Soma ${soma}${linhaNum != null ? `<span class="sep">·</span>Linha ${linhaNum}` : (m.linhaMercado ? `<span class="sep">·</span>${escapeHtml(m.linhaMercado)}` : '')}${m.margemSeguranca != null ? `<span class="sep">·</span>Margem ${margem}` : ''}${m.totalJogo != null ? `<span class="sep">·</span>Total do jogo ${Number(m.totalJogo).toFixed(1)}` : ''}</div>
               ${m.odd != null ? `<span class="an-odd-highlight">Odd<strong>${Number(m.odd).toFixed(2)}</strong></span>` : ''}
             </div>
-          </div>
+          </button>
           <div class="an-saved-toolbar">
             ${m.casaAposta && m.casaAposta.dominio ? `<img class="an-casa-icon" src="${bookmakerIconUrl(m.casaAposta.dominio)}" alt="${escapeHtml(m.casaAposta.nome)}" title="${escapeHtml(m.casaAposta.nome)}">` : (m.casaAposta ? `<span class="an-mercado-chip">${escapeHtml(m.casaAposta.nome)}</span>` : '')}
             ${resultadoHtml}
+            <button class="icon-btn" title="Editar" onclick="toggleManualDetail('${m.id}')">✎</button>
             <button class="icon-btn" title="Excluir" onclick="deleteManual('${m.id}')">✕</button>
           </div>
-          <div class="an-saved-detail" style="display:block;padding-top:0;">
+          <div class="an-saved-detail" style="display:${isOpen ? 'block' : 'none'};">
             <div class="an-check-box" style="margin-top:10px;">
-              <label>Total do jogo (preencher quando souber o resultado real)</label>
-              <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
-                <input type="text" inputmode="decimal" id="man-edit-total-${m.id}" value="${m.totalJogo != null ? String(m.totalJogo) : ''}" placeholder="ex: 15.0" style="max-width:140px;">
-                <button type="button" class="primary" style="width:auto;padding:9px 16px;" onclick="updateManualTotalJogo('${m.id}')">Salvar</button>
+              <label>Editar análise manual</label>
+              <div class="row-2" style="margin-top:10px;">
+                <div class="field" style="margin-bottom:10px;">
+                  <label>Time</label>
+                  <input type="text" id="man-edit-time-${m.id}" value="${m.time ? escapeHtml(m.time) : ''}">
+                </div>
+                <div class="field" style="margin-bottom:10px;">
+                  <label>ODD Vitória</label>
+                  <input type="text" inputmode="decimal" id="man-edit-odd-vitoria-${m.id}" value="${m.oddVitoria != null ? String(m.oddVitoria) : ''}" placeholder="ex: 1.50">
+                </div>
               </div>
-              <div id="man-edit-total-result-${m.id}" style="margin-top:8px;font-size:12.5px;"></div>
+              <div class="row-2">
+                <div class="field" style="margin-bottom:10px;">
+                  <label>Casa ou fora</label>
+                  <select id="man-edit-mando-${m.id}">
+                    <option value="Casa" ${m.mando === 'Casa' ? 'selected' : ''}>Casa</option>
+                    <option value="Fora" ${m.mando === 'Fora' ? 'selected' : ''}>Fora</option>
+                  </select>
+                </div>
+                <div class="field" style="margin-bottom:10px;">
+                  <label>Casa de apostas</label>
+                  <input type="text" id="man-edit-casa-${m.id}" list="an-casas-list" value="${m.casaAposta ? escapeHtml(m.casaAposta.nome) : ''}">
+                </div>
+              </div>
+              <div class="row-2">
+                <div class="field" style="margin-bottom:10px;">
+                  <label>Média de chutes</label>
+                  <input type="text" inputmode="decimal" id="man-edit-chutes-${m.id}" value="${m.mediaChutes != null ? String(m.mediaChutes) : ''}" placeholder="ex: 12.4">
+                </div>
+                <div class="field" style="margin-bottom:10px;">
+                  <label>Média de chutes ao gol</label>
+                  <input type="text" inputmode="decimal" id="man-edit-chutes-gol-${m.id}" value="${m.mediaChutesGol != null ? String(m.mediaChutesGol) : ''}" placeholder="ex: 4.8">
+                </div>
+              </div>
+              <div class="row-2">
+                <div class="field" style="margin-bottom:10px;">
+                  <label>Linha Mercado</label>
+                  <input type="text" inputmode="decimal" id="man-edit-linha-${m.id}" value="${m.linhaMercado != null ? String(m.linhaMercado) : ''}" placeholder="ex: 3.5">
+                </div>
+                <div class="field" style="margin-bottom:10px;">
+                  <label>Odd</label>
+                  <input type="text" inputmode="decimal" id="man-edit-odd-${m.id}" value="${m.odd != null ? String(m.odd) : ''}" placeholder="ex: 1.85">
+                </div>
+              </div>
+              <div class="field" style="margin-bottom:10px;max-width:200px;">
+                <label>Total do jogo (preencher quando souber o resultado real)</label>
+                <input type="text" inputmode="decimal" id="man-edit-total-${m.id}" value="${m.totalJogo != null ? String(m.totalJogo) : ''}" placeholder="ex: 15.0">
+              </div>
+              <button type="button" class="primary" style="width:auto;padding:9px 16px;" onclick="updateManualEntry('${m.id}')">Salvar</button>
+              <div id="man-edit-result-${m.id}" style="margin-top:8px;font-size:12.5px;"></div>
             </div>
           </div>
         </div>
       `;
     }).join('');
-    container.querySelectorAll('input[id^="man-edit-total-"]').forEach(el => maskOneDecimalInput(el));
+    if(expandedManualId){
+      ['man-edit-odd-vitoria-', 'man-edit-odd-'].forEach(prefix => {
+        const el = document.getElementById(prefix + expandedManualId);
+        if(el) maskDecimalInputDot(el);
+      });
+      ['man-edit-chutes-', 'man-edit-chutes-gol-', 'man-edit-linha-', 'man-edit-total-'].forEach(prefix => {
+        const el = document.getElementById(prefix + expandedManualId);
+        if(el) maskOneDecimalInput(el);
+      });
+    }
   }
 
   function extractAiJson(textBlock){
