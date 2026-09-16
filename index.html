@@ -1114,9 +1114,15 @@
       <h2>Nova análise manual</h2>
       <p class="sub">Pra registrar sua própria leitura (ex: mercado de defesas do goleiro), sem passar pela IA.</p>
 
-      <div class="field">
-        <label for="man-time">Time</label>
-        <input type="text" id="man-time" placeholder="Nome do time">
+      <div class="row-2">
+        <div class="field">
+          <label for="man-time">Time</label>
+          <input type="text" id="man-time" placeholder="Nome do time">
+        </div>
+        <div class="field">
+          <label for="man-odd-vitoria">ODD Vitória</label>
+          <input type="text" inputmode="decimal" id="man-odd-vitoria" placeholder="ex: 1,50">
+        </div>
       </div>
 
       <div class="field">
@@ -1145,6 +1151,11 @@
       <div class="field">
         <label for="man-margem">Margem de segurança</label>
         <input type="text" inputmode="decimal" id="man-margem" placeholder="ex: 2,0">
+      </div>
+
+      <div class="field">
+        <label for="man-linha-mercado">Linha Mercado</label>
+        <input type="text" id="man-linha-mercado" placeholder="ex: Mais de 3.5 defesas">
       </div>
 
       <div class="field">
@@ -1668,7 +1679,7 @@
   // ANÁLISE MANUAL — sem IA. Usuário preenche os números e o site só
   // soma/organiza/guarda o histórico com green/red.
   // ---------------------------------------------------------------
-  ['man-chutes', 'man-chutes-gol', 'man-margem', 'man-odd', 'man-total-jogo'].forEach(id => {
+  ['man-chutes', 'man-chutes-gol', 'man-margem', 'man-odd-vitoria', 'man-odd', 'man-total-jogo'].forEach(id => {
     const el = document.getElementById(id);
     if(el) maskDecimalInput(el);
   });
@@ -1695,10 +1706,12 @@
   document.getElementById('man-save').addEventListener('click', async () => {
     const resultEl = document.getElementById('man-save-result');
     const time = document.getElementById('man-time').value.trim();
+    const oddVitoria = parseMaskedVal(document.getElementById('man-odd-vitoria'));
     const mando = document.getElementById('man-mando').value;
     const chutes = parseMaskedVal(document.getElementById('man-chutes'));
     const chutesGol = parseMaskedVal(document.getElementById('man-chutes-gol'));
     const margem = parseMaskedVal(document.getElementById('man-margem'));
+    const linhaMercado = document.getElementById('man-linha-mercado').value.trim();
     const odd = parseMaskedVal(document.getElementById('man-odd'));
     const totalJogo = parseMaskedVal(document.getElementById('man-total-jogo'));
     const casaNome = document.getElementById('man-casa').value.trim();
@@ -1713,11 +1726,13 @@
     try{
       await manuaisRef.add({
         time,
+        oddVitoria: isNaN(oddVitoria) ? null : oddVitoria,
         mando,
         mediaChutes: chutes,
         mediaChutesGol: chutesGol,
         soma: chutes + chutesGol,
         margemSeguranca: isNaN(margem) ? null : margem,
+        linhaMercado: linhaMercado || null,
         odd: isNaN(odd) ? null : odd,
         casaAposta: casaEncontrada || (casaNome ? { nome: casaNome, dominio: '' } : null),
         totalJogo: isNaN(totalJogo) ? null : totalJogo,
@@ -1726,7 +1741,7 @@
       });
       resultEl.style.color = 'var(--safe)';
       resultEl.textContent = '✓ Análise manual salva.';
-      ['man-time', 'man-chutes', 'man-chutes-gol', 'man-margem', 'man-odd', 'man-casa', 'man-total-jogo'].forEach(id => {
+      ['man-time', 'man-odd-vitoria', 'man-chutes', 'man-chutes-gol', 'man-margem', 'man-linha-mercado', 'man-odd', 'man-casa', 'man-total-jogo'].forEach(id => {
         document.getElementById(id).value = '';
       });
       document.getElementById('man-mando').value = 'Casa';
@@ -1815,8 +1830,8 @@
         <div class="an-saved-item">
           <div class="an-saved-row" style="cursor:default;">
             <div class="an-saved-info">
-              <div class="name"><span class="arrow">▸</span> ${escapeHtml(m.time || '—')}${m.mando ? ` <span class="sep">·</span> ${escapeHtml(m.mando)}` : ''}</div>
-              <div class="an-market-highlight">Chutes ${escapeHtml(String(m.mediaChutes ?? '—'))}<span class="sep">·</span>Chutes ao gol ${escapeHtml(String(m.mediaChutesGol ?? '—'))}<span class="sep">·</span>Soma ${soma}${m.margemSeguranca != null ? `<span class="sep">·</span>Margem ${margem}` : ''}</div>
+              <div class="name"><span class="arrow">▸</span> ${escapeHtml(m.time || '—')}${m.mando ? ` <span class="sep">·</span> ${escapeHtml(m.mando)}` : ''}${m.oddVitoria != null ? ` <span class="sep">·</span> ODD Vitória ${Number(m.oddVitoria).toFixed(2)}` : ''}</div>
+              <div class="an-market-highlight">Chutes ${escapeHtml(String(m.mediaChutes ?? '—'))}<span class="sep">·</span>Chutes ao gol ${escapeHtml(String(m.mediaChutesGol ?? '—'))}<span class="sep">·</span>Soma ${soma}${m.margemSeguranca != null ? `<span class="sep">·</span>Margem ${margem}` : ''}${m.linhaMercado ? `<span class="sep">·</span>${escapeHtml(m.linhaMercado)}` : ''}</div>
               ${m.odd != null ? `<span class="an-odd-highlight">Odd<strong>${Number(m.odd).toFixed(2)}</strong></span>` : ''}
             </div>
           </div>
