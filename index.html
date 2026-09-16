@@ -1006,10 +1006,10 @@
   </header>
 
   <nav class="tabs" id="tabs">
-    <button class="tab-btn active" data-view="analises">Análises</button>
+    <button class="tab-btn" data-view="manual">Análise Manual</button>
+    <button class="tab-btn active" data-view="analises">Análises IA</button>
     <button class="tab-btn" data-view="calculadora">Calculadora do dia</button>
     <button class="tab-btn" data-view="ganhos">Banca - Ganhos/Perdas</button>
-    <button class="tab-btn" data-view="manual">Análise Manual</button>
   </nav>
 
   <datalist id="an-casas-list"></datalist>
@@ -1165,13 +1165,8 @@
       <span class="man-section-title">Comparação Casas Apostas</span>
 
       <div class="field">
-        <label for="man-margem">Margem de segurança</label>
-        <input type="text" inputmode="decimal" id="man-margem" placeholder="ex: 2,0">
-      </div>
-
-      <div class="field">
         <label for="man-linha-mercado">Linha Mercado</label>
-        <input type="text" id="man-linha-mercado" placeholder="ex: Mais de 3.5 defesas">
+        <input type="text" inputmode="decimal" id="man-linha-mercado" placeholder="ex: 3,5">
       </div>
 
       <div class="field">
@@ -1182,6 +1177,11 @@
       <div class="field">
         <label for="man-casa">Casa de apostas</label>
         <input type="text" id="man-casa" list="an-casas-list" placeholder="Pesquisar casa de apostas...">
+      </div>
+
+      <div class="field">
+        <label>Margem</label>
+        <div id="man-margem" class="man-soma-display">—</div>
       </div>
 
       <div class="field">
@@ -1695,7 +1695,7 @@
   // ANÁLISE MANUAL — sem IA. Usuário preenche os números e o site só
   // soma/organiza/guarda o histórico com green/red.
   // ---------------------------------------------------------------
-  ['man-chutes', 'man-chutes-gol', 'man-margem', 'man-odd-vitoria', 'man-odd', 'man-total-jogo'].forEach(id => {
+  ['man-chutes', 'man-chutes-gol', 'man-linha-mercado', 'man-odd-vitoria', 'man-odd', 'man-total-jogo'].forEach(id => {
     const el = document.getElementById(id);
     if(el) maskDecimalInput(el);
   });
@@ -1705,19 +1705,35 @@
     return parseFloat(el.value.replace(',', '.'));
   }
 
-  function updateManSoma(){
+  function currentSoma(){
     const chutes = parseMaskedVal(document.getElementById('man-chutes'));
     const chutesGol = parseMaskedVal(document.getElementById('man-chutes-gol'));
-    const somaEl = document.getElementById('man-soma');
-    if(isNaN(chutes) || isNaN(chutesGol)){
-      somaEl.textContent = '—';
+    if(isNaN(chutes) || isNaN(chutesGol)) return null;
+    return chutes + chutesGol;
+  }
+
+  function updateManSoma(){
+    const soma = currentSoma();
+    document.getElementById('man-soma').textContent = soma == null ? '—' : soma.toFixed(2).replace('.', ',');
+    updateManMargem();
+  }
+
+  // MARGEM = Soma de ambos (projeção Tip Score) − Linha Mercado (linha
+  // oferecida pela casa) — quanto maior, mais folga a linha tem.
+  function updateManMargem(){
+    const soma = currentSoma();
+    const linha = parseMaskedVal(document.getElementById('man-linha-mercado'));
+    const margemEl = document.getElementById('man-margem');
+    if(soma == null || isNaN(linha)){
+      margemEl.textContent = '—';
       return;
     }
-    somaEl.textContent = (chutes + chutesGol).toFixed(2).replace('.', ',');
+    margemEl.textContent = (soma - linha).toFixed(2).replace('.', ',');
   }
   ['man-chutes', 'man-chutes-gol'].forEach(id => {
     document.getElementById(id).addEventListener('input', updateManSoma);
   });
+  document.getElementById('man-linha-mercado').addEventListener('input', updateManMargem);
 
   document.getElementById('man-save').addEventListener('click', async () => {
     const resultEl = document.getElementById('man-save-result');
@@ -1726,11 +1742,12 @@
     const mando = document.getElementById('man-mando').value;
     const chutes = parseMaskedVal(document.getElementById('man-chutes'));
     const chutesGol = parseMaskedVal(document.getElementById('man-chutes-gol'));
-    const margem = parseMaskedVal(document.getElementById('man-margem'));
-    const linhaMercado = document.getElementById('man-linha-mercado').value.trim();
+    const linhaMercado = parseMaskedVal(document.getElementById('man-linha-mercado'));
     const odd = parseMaskedVal(document.getElementById('man-odd'));
     const totalJogo = parseMaskedVal(document.getElementById('man-total-jogo'));
     const casaNome = document.getElementById('man-casa').value.trim();
+    const soma = currentSoma();
+    const margem = (soma != null && !isNaN(linhaMercado)) ? (soma - linhaMercado) : null;
 
     if(!time || isNaN(chutes) || isNaN(chutesGol)){
       resultEl.style.color = 'var(--warn)';
@@ -1747,8 +1764,8 @@
         mediaChutes: chutes,
         mediaChutesGol: chutesGol,
         soma: chutes + chutesGol,
-        margemSeguranca: isNaN(margem) ? null : margem,
-        linhaMercado: linhaMercado || null,
+        linhaMercado: isNaN(linhaMercado) ? null : linhaMercado,
+        margemSeguranca: margem,
         odd: isNaN(odd) ? null : odd,
         casaAposta: casaEncontrada || (casaNome ? { nome: casaNome, dominio: '' } : null),
         totalJogo: isNaN(totalJogo) ? null : totalJogo,
@@ -1757,7 +1774,7 @@
       });
       resultEl.style.color = 'var(--safe)';
       resultEl.textContent = '✓ Análise manual salva.';
-      ['man-time', 'man-odd-vitoria', 'man-chutes', 'man-chutes-gol', 'man-margem', 'man-linha-mercado', 'man-odd', 'man-casa', 'man-total-jogo'].forEach(id => {
+      ['man-time', 'man-odd-vitoria', 'man-chutes', 'man-chutes-gol', 'man-linha-mercado', 'man-odd', 'man-casa', 'man-total-jogo'].forEach(id => {
         document.getElementById(id).value = '';
       });
       document.getElementById('man-mando').value = 'Casa';
@@ -1842,12 +1859,13 @@
       }
       const soma = m.soma != null ? Number(m.soma).toFixed(2) : '—';
       const margem = m.margemSeguranca != null ? Number(m.margemSeguranca).toFixed(2) : '—';
+      const linhaNum = m.linhaMercado != null && !isNaN(Number(m.linhaMercado)) ? Number(m.linhaMercado).toFixed(2) : null;
       return `
         <div class="an-saved-item">
           <div class="an-saved-row" style="cursor:default;">
             <div class="an-saved-info">
               <div class="name"><span class="arrow">▸</span> ${escapeHtml(m.time || '—')}${m.mando ? ` <span class="sep">·</span> ${escapeHtml(m.mando)}` : ''}${m.oddVitoria != null ? ` <span class="sep">·</span> ODD Vitória ${Number(m.oddVitoria).toFixed(2)}` : ''}</div>
-              <div class="an-market-highlight">Chutes ${escapeHtml(String(m.mediaChutes ?? '—'))}<span class="sep">·</span>Chutes ao gol ${escapeHtml(String(m.mediaChutesGol ?? '—'))}<span class="sep">·</span>Soma ${soma}${m.margemSeguranca != null ? `<span class="sep">·</span>Margem ${margem}` : ''}${m.linhaMercado ? `<span class="sep">·</span>${escapeHtml(m.linhaMercado)}` : ''}</div>
+              <div class="an-market-highlight">Chutes ${escapeHtml(String(m.mediaChutes ?? '—'))}<span class="sep">·</span>Chutes ao gol ${escapeHtml(String(m.mediaChutesGol ?? '—'))}<span class="sep">·</span>Soma ${soma}${linhaNum != null ? `<span class="sep">·</span>Linha ${linhaNum}` : (m.linhaMercado ? `<span class="sep">·</span>${escapeHtml(m.linhaMercado)}` : '')}${m.margemSeguranca != null ? `<span class="sep">·</span>Margem ${margem}` : ''}</div>
               ${m.odd != null ? `<span class="an-odd-highlight">Odd<strong>${Number(m.odd).toFixed(2)}</strong></span>` : ''}
             </div>
           </div>
