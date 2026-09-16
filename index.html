@@ -1444,6 +1444,20 @@
   }
   ['c-odd', 'c-valor', 'c-cashout-valor'].forEach(id => maskDecimalInput(document.getElementById(id)));
 
+  // Formato "00,0" (1 casa decimal) — usado nos campos de médias/linha
+  // do jogo, que não precisam de 2 casas como odd e valores em R$.
+  function maskOneDecimalInput(el){
+    el.addEventListener('input', () => {
+      let digits = el.value.replace(/\D/g, '');
+      digits = digits.replace(/^0+(?=\d)/, '');
+      if(digits === ''){ el.value = ''; return; }
+      while(digits.length < 2) digits = '0' + digits;
+      const intPart = digits.slice(0, -1);
+      const decPart = digits.slice(-1);
+      el.value = parseInt(intPart, 10) + ',' + decPart;
+    });
+  }
+
   function parseMasked(id){
     const val = document.getElementById(id).value;
     if(!val) return NaN;
@@ -1695,9 +1709,13 @@
   // ANÁLISE MANUAL — sem IA. Usuário preenche os números e o site só
   // soma/organiza/guarda o histórico com green/red.
   // ---------------------------------------------------------------
-  ['man-chutes', 'man-chutes-gol', 'man-linha-mercado', 'man-odd-vitoria', 'man-odd', 'man-total-jogo'].forEach(id => {
+  ['man-odd-vitoria', 'man-odd'].forEach(id => {
     const el = document.getElementById(id);
     if(el) maskDecimalInput(el);
+  });
+  ['man-chutes', 'man-chutes-gol', 'man-linha-mercado', 'man-total-jogo'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) maskOneDecimalInput(el);
   });
 
   function parseMaskedVal(el){
