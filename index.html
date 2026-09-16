@@ -1934,13 +1934,13 @@
       const linhaNum = m.linhaMercado != null && !isNaN(Number(m.linhaMercado)) ? Number(m.linhaMercado).toFixed(1) : null;
       return `
         <div class="an-saved-item">
-          <button type="button" class="an-saved-row" onclick="toggleManualDetail('${m.id}')">
+          <div class="an-saved-row" style="cursor:default;">
             <div class="an-saved-info">
               <div class="name"><span class="arrow">${isOpen ? '▾' : '▸'}</span> ${escapeHtml(m.time || '—')}${m.mando ? ` <span class="sep">·</span> ${escapeHtml(m.mando)}` : ''}${m.oddVitoria != null ? ` <span class="sep">·</span> ODD Vitória ${Number(m.oddVitoria).toFixed(2)}` : ''}</div>
               <div class="an-market-highlight">Chutes ${escapeHtml(String(m.mediaChutes ?? '—'))}<span class="sep">·</span>Chutes ao gol ${escapeHtml(String(m.mediaChutesGol ?? '—'))}<span class="sep">·</span>Soma ${soma}${linhaNum != null ? `<span class="sep">·</span>Linha ${linhaNum}` : (m.linhaMercado ? `<span class="sep">·</span>${escapeHtml(m.linhaMercado)}` : '')}${m.margemSeguranca != null ? `<span class="sep">·</span>Margem ${margem}` : ''}${m.totalJogo != null ? `<span class="sep">·</span>Total do jogo ${Number(m.totalJogo).toFixed(1)}` : ''}</div>
               ${m.odd != null ? `<span class="an-odd-highlight">Odd<strong>${Number(m.odd).toFixed(2)}</strong></span>` : ''}
             </div>
-          </button>
+          </div>
           <div class="an-saved-toolbar">
             ${m.casaAposta && m.casaAposta.dominio ? `<img class="an-casa-icon" src="${bookmakerIconUrl(m.casaAposta.dominio)}" alt="${escapeHtml(m.casaAposta.nome)}" title="${escapeHtml(m.casaAposta.nome)}">` : (m.casaAposta ? `<span class="an-mercado-chip">${escapeHtml(m.casaAposta.nome)}</span>` : '')}
             ${resultadoHtml}
