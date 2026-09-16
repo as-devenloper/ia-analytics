@@ -1135,7 +1135,7 @@
         </div>
         <div class="field">
           <label for="man-odd-vitoria">ODD Vitória</label>
-          <input type="text" inputmode="decimal" id="man-odd-vitoria" placeholder="ex: 1,50">
+          <input type="text" inputmode="decimal" id="man-odd-vitoria" placeholder="ex: 1.50">
         </div>
       </div>
 
@@ -1149,12 +1149,12 @@
 
       <div class="field">
         <label for="man-chutes">Média de chutes (últ. 10 jogos)</label>
-        <input type="text" inputmode="decimal" id="man-chutes" placeholder="ex: 12,4">
+        <input type="text" inputmode="decimal" id="man-chutes" placeholder="ex: 12.4">
       </div>
 
       <div class="field">
         <label for="man-chutes-gol">Média de chutes ao gol (últ. 10 jogos)</label>
-        <input type="text" inputmode="decimal" id="man-chutes-gol" placeholder="ex: 4,8">
+        <input type="text" inputmode="decimal" id="man-chutes-gol" placeholder="ex: 4.8">
       </div>
 
       <div class="field">
@@ -1166,12 +1166,12 @@
 
       <div class="field">
         <label for="man-linha-mercado">Linha Mercado</label>
-        <input type="text" inputmode="decimal" id="man-linha-mercado" placeholder="ex: 3,5">
+        <input type="text" inputmode="decimal" id="man-linha-mercado" placeholder="ex: 3.5">
       </div>
 
       <div class="field">
         <label for="man-odd">Odd</label>
-        <input type="text" inputmode="decimal" id="man-odd" placeholder="ex: 1,85">
+        <input type="text" inputmode="decimal" id="man-odd" placeholder="ex: 1.85">
       </div>
 
       <div class="field">
@@ -1186,7 +1186,7 @@
 
       <div class="field">
         <label for="man-total-jogo">Total do jogo (preencher depois, quando souber)</label>
-        <input type="text" inputmode="decimal" id="man-total-jogo" placeholder="ex: 15,0 (opcional por enquanto)">
+        <input type="text" inputmode="decimal" id="man-total-jogo" placeholder="ex: 15.0 (opcional por enquanto)">
       </div>
 
       <button type="button" class="primary" id="man-save" style="margin-top:8px;">Salvar análise manual</button>
@@ -1454,7 +1454,21 @@
       while(digits.length < 2) digits = '0' + digits;
       const intPart = digits.slice(0, -1);
       const decPart = digits.slice(-1);
-      el.value = parseInt(intPart, 10) + ',' + decPart;
+      el.value = parseInt(intPart, 10) + '.' + decPart;
+    });
+  }
+
+  // Igual à de 2 casas acima, mas com ponto em vez de vírgula — só pra
+  // ODD Vitória e Odd da aba de análise manual.
+  function maskDecimalInputDot(el){
+    el.addEventListener('input', () => {
+      let digits = el.value.replace(/\D/g, '');
+      digits = digits.replace(/^0+(?=\d)/, '');
+      if(digits === ''){ el.value = ''; return; }
+      while(digits.length < 3) digits = '0' + digits;
+      const intPart = digits.slice(0, -2);
+      const decPart = digits.slice(-2);
+      el.value = parseInt(intPart, 10) + '.' + decPart;
     });
   }
 
@@ -1711,7 +1725,7 @@
   // ---------------------------------------------------------------
   ['man-odd-vitoria', 'man-odd'].forEach(id => {
     const el = document.getElementById(id);
-    if(el) maskDecimalInput(el);
+    if(el) maskDecimalInputDot(el);
   });
   ['man-chutes', 'man-chutes-gol', 'man-linha-mercado', 'man-total-jogo'].forEach(id => {
     const el = document.getElementById(id);
@@ -1732,7 +1746,7 @@
 
   function updateManSoma(){
     const soma = currentSoma();
-    document.getElementById('man-soma').textContent = soma == null ? '—' : soma.toFixed(2).replace('.', ',');
+    document.getElementById('man-soma').textContent = soma == null ? '—' : soma.toFixed(1);
     updateManMargem();
   }
 
@@ -1746,7 +1760,7 @@
       margemEl.textContent = '—';
       return;
     }
-    margemEl.textContent = (soma - linha).toFixed(2).replace('.', ',');
+    margemEl.textContent = (soma - linha).toFixed(1);
   }
   ['man-chutes', 'man-chutes-gol'].forEach(id => {
     document.getElementById(id).addEventListener('input', updateManSoma);
@@ -1875,9 +1889,9 @@
         const badge = resultadoBadge(resultado);
         resultadoHtml = `<span class="badge ${badge.cls} clickable" title="Clique para voltar a pendente" onclick="markManualResult('${m.id}','pendente')">${badge.label}</span>`;
       }
-      const soma = m.soma != null ? Number(m.soma).toFixed(2) : '—';
-      const margem = m.margemSeguranca != null ? Number(m.margemSeguranca).toFixed(2) : '—';
-      const linhaNum = m.linhaMercado != null && !isNaN(Number(m.linhaMercado)) ? Number(m.linhaMercado).toFixed(2) : null;
+      const soma = m.soma != null ? Number(m.soma).toFixed(1) : '—';
+      const margem = m.margemSeguranca != null ? Number(m.margemSeguranca).toFixed(1) : '—';
+      const linhaNum = m.linhaMercado != null && !isNaN(Number(m.linhaMercado)) ? Number(m.linhaMercado).toFixed(1) : null;
       return `
         <div class="an-saved-item">
           <div class="an-saved-row" style="cursor:default;">
@@ -1896,7 +1910,7 @@
             <div class="an-check-box" style="margin-top:10px;">
               <label>Total do jogo (preencher quando souber o resultado real)</label>
               <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
-                <input type="text" inputmode="decimal" id="man-edit-total-${m.id}" value="${m.totalJogo != null ? String(m.totalJogo).replace('.', ',') : ''}" placeholder="ex: 15,0" style="max-width:140px;">
+                <input type="text" inputmode="decimal" id="man-edit-total-${m.id}" value="${m.totalJogo != null ? String(m.totalJogo) : ''}" placeholder="ex: 15.0" style="max-width:140px;">
                 <button type="button" class="primary" style="width:auto;padding:9px 16px;" onclick="updateManualTotalJogo('${m.id}')">Salvar</button>
               </div>
               <div id="man-edit-total-result-${m.id}" style="margin-top:8px;font-size:12.5px;"></div>
@@ -1905,6 +1919,7 @@
         </div>
       `;
     }).join('');
+    container.querySelectorAll('input[id^="man-edit-total-"]').forEach(el => maskOneDecimalInput(el));
   }
 
   function extractAiJson(textBlock){
