@@ -143,6 +143,17 @@
   }
   .row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 
+  .man-soma-display{
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:9px 10px;
+    color:var(--safe);
+    font-family:var(--font-mono);
+    font-size:14px;
+    font-weight:600;
+  }
+
   .toggle-group{display:flex;gap:8px;}
   .toggle-group button{
     flex:1;
@@ -986,6 +997,7 @@
     <button class="tab-btn active" data-view="analises">Análises</button>
     <button class="tab-btn" data-view="calculadora">Calculadora do dia</button>
     <button class="tab-btn" data-view="ganhos">Banca - Ganhos/Perdas</button>
+    <button class="tab-btn" data-view="manual">Análise Manual</button>
   </nav>
 
   <datalist id="an-casas-list"></datalist>
@@ -1097,6 +1109,71 @@
     <div id="ganhos-container"></div>
   </section>
 
+  <div class="grid" id="view-manual" style="display:none;">
+    <section class="panel">
+      <h2>Nova análise manual</h2>
+      <p class="sub">Pra registrar sua própria leitura (ex: mercado de defesas do goleiro), sem passar pela IA.</p>
+
+      <div class="field">
+        <label for="man-time">Time</label>
+        <input type="text" id="man-time" placeholder="Nome do time">
+      </div>
+
+      <div class="field">
+        <label for="man-mando">Casa ou fora</label>
+        <select id="man-mando">
+          <option value="Casa">Casa</option>
+          <option value="Fora">Fora</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="man-chutes">Média de chutes (últ. 10 jogos)</label>
+        <input type="text" inputmode="decimal" id="man-chutes" placeholder="ex: 12,4">
+      </div>
+
+      <div class="field">
+        <label for="man-chutes-gol">Média de chutes ao gol (últ. 10 jogos)</label>
+        <input type="text" inputmode="decimal" id="man-chutes-gol" placeholder="ex: 4,8">
+      </div>
+
+      <div class="field">
+        <label>Soma de ambos</label>
+        <div id="man-soma" class="man-soma-display">—</div>
+      </div>
+
+      <div class="field">
+        <label for="man-margem">Margem de segurança</label>
+        <input type="text" inputmode="decimal" id="man-margem" placeholder="ex: 2,0">
+      </div>
+
+      <div class="field">
+        <label for="man-odd">Odd</label>
+        <input type="text" inputmode="decimal" id="man-odd" placeholder="ex: 1,85">
+      </div>
+
+      <div class="field">
+        <label for="man-casa">Casa de apostas</label>
+        <input type="text" id="man-casa" list="an-casas-list" placeholder="Pesquisar casa de apostas...">
+      </div>
+
+      <div class="field">
+        <label for="man-total-jogo">Total do jogo (preencher depois, quando souber)</label>
+        <input type="text" inputmode="decimal" id="man-total-jogo" placeholder="ex: 15,0 (opcional por enquanto)">
+      </div>
+
+      <button type="button" class="primary" id="man-save" style="margin-top:8px;">Salvar análise manual</button>
+      <div id="man-save-result" style="margin-top:8px;font-size:12.5px;"></div>
+    </section>
+
+    <section class="panel" style="grid-column: 1 / -1;">
+      <h2>Histórico de Análises Manuais</h2>
+      <p class="sub">Acompanhe o histórico das análises manuais feitas.</p>
+      <div id="man-stats-summary" class="profit-summary" style="margin-bottom:18px;"></div>
+      <div id="man-saved-container"></div>
+    </section>
+  </div>
+
 </div>
 
 
@@ -1152,14 +1229,17 @@
   const auth = firebase.auth();
   const movimentosRef = db.collection('movimentos');
   const analisesRef = db.collection('analises');
+  const manuaisRef = db.collection('manuais');
 
   // Cada aposta enviada pela Calculadora vira um documento aqui —
   // isso permite listar e apagar movimentações específicas por dia.
   let movimentosAll = [];
   let analisesAll = [];
+  let manuaisAll = [];
   let firestoreListenersStarted = false;
   let unsubMovimentos = null;
   let unsubAnalises = null;
+  let unsubManuais = null;
 
   function startFirestoreListeners(){
     if(firestoreListenersStarted) return;
@@ -1182,16 +1262,29 @@
       },
       (err) => console.error(err)
     );
+
+    // Análises feitas manualmente pelo usuário (sem IA), ex: mercado de
+    // defesas do goleiro a partir de chutes + chutes ao gol.
+    unsubManuais = manuaisRef.orderBy('createdAt', 'desc').onSnapshot(
+      (snapshot) => {
+        manuaisAll = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        if(document.getElementById('view-manual').style.display !== 'none') renderManuaisSalvas();
+      },
+      (err) => console.error(err)
+    );
   }
 
   function stopFirestoreListeners(){
     if(unsubMovimentos) unsubMovimentos();
     if(unsubAnalises) unsubAnalises();
+    if(unsubManuais) unsubManuais();
     unsubMovimentos = null;
     unsubAnalises = null;
+    unsubManuais = null;
     firestoreListenersStarted = false;
     movimentosAll = [];
     analisesAll = [];
+    manuaisAll = [];
   }
 
   // ---------------------------------------------------------------
@@ -1290,7 +1383,9 @@
     document.getElementById('view-analises').style.display = view === 'analises' ? 'grid' : 'none';
     document.getElementById('view-calculadora').style.display = view === 'calculadora' ? 'grid' : 'none';
     document.getElementById('view-ganhos').style.display = view === 'ganhos' ? 'block' : 'none';
+    document.getElementById('view-manual').style.display = view === 'manual' ? 'grid' : 'none';
     if(view === 'ganhos') renderGanhos();
+    if(view === 'manual') renderManuaisSalvas();
   });
 
   // ---------------------------------------------------------------
@@ -1568,6 +1663,182 @@
     list.innerHTML = BOOKMAKERS.map(b => `<option value="${escapeHtml(b.nome)}">`).join('');
   }
   populateCasasList();
+
+  // ---------------------------------------------------------------
+  // ANÁLISE MANUAL — sem IA. Usuário preenche os números e o site só
+  // soma/organiza/guarda o histórico com green/red.
+  // ---------------------------------------------------------------
+  ['man-chutes', 'man-chutes-gol', 'man-margem', 'man-odd', 'man-total-jogo'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) maskDecimalInput(el);
+  });
+
+  function parseMaskedVal(el){
+    if(!el || !el.value) return NaN;
+    return parseFloat(el.value.replace(',', '.'));
+  }
+
+  function updateManSoma(){
+    const chutes = parseMaskedVal(document.getElementById('man-chutes'));
+    const chutesGol = parseMaskedVal(document.getElementById('man-chutes-gol'));
+    const somaEl = document.getElementById('man-soma');
+    if(isNaN(chutes) || isNaN(chutesGol)){
+      somaEl.textContent = '—';
+      return;
+    }
+    somaEl.textContent = (chutes + chutesGol).toFixed(2).replace('.', ',');
+  }
+  ['man-chutes', 'man-chutes-gol'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updateManSoma);
+  });
+
+  document.getElementById('man-save').addEventListener('click', async () => {
+    const resultEl = document.getElementById('man-save-result');
+    const time = document.getElementById('man-time').value.trim();
+    const mando = document.getElementById('man-mando').value;
+    const chutes = parseMaskedVal(document.getElementById('man-chutes'));
+    const chutesGol = parseMaskedVal(document.getElementById('man-chutes-gol'));
+    const margem = parseMaskedVal(document.getElementById('man-margem'));
+    const odd = parseMaskedVal(document.getElementById('man-odd'));
+    const totalJogo = parseMaskedVal(document.getElementById('man-total-jogo'));
+    const casaNome = document.getElementById('man-casa').value.trim();
+
+    if(!time || isNaN(chutes) || isNaN(chutesGol)){
+      resultEl.style.color = 'var(--warn)';
+      resultEl.textContent = 'Preencha pelo menos o time, a média de chutes e a média de chutes ao gol.';
+      return;
+    }
+    const casaEncontrada = BOOKMAKERS.find(b => b.nome.toLowerCase() === casaNome.toLowerCase());
+
+    try{
+      await manuaisRef.add({
+        time,
+        mando,
+        mediaChutes: chutes,
+        mediaChutesGol: chutesGol,
+        soma: chutes + chutesGol,
+        margemSeguranca: isNaN(margem) ? null : margem,
+        odd: isNaN(odd) ? null : odd,
+        casaAposta: casaEncontrada || (casaNome ? { nome: casaNome, dominio: '' } : null),
+        totalJogo: isNaN(totalJogo) ? null : totalJogo,
+        resultado: 'pendente',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      resultEl.style.color = 'var(--safe)';
+      resultEl.textContent = '✓ Análise manual salva.';
+      ['man-time', 'man-chutes', 'man-chutes-gol', 'man-margem', 'man-odd', 'man-casa', 'man-total-jogo'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('man-mando').value = 'Casa';
+      updateManSoma();
+    } catch(err){
+      console.error(err);
+      resultEl.style.color = 'var(--warn)';
+      resultEl.textContent = 'Não foi possível salvar. Confira sua conexão.';
+    }
+  });
+
+  async function markManualResult(id, resultado){
+    try{
+      await manuaisRef.doc(id).update({ resultado });
+    } catch(err){
+      console.error(err);
+      alert('Não foi possível salvar o resultado. Confira sua conexão.');
+    }
+  }
+
+  async function deleteManual(id){
+    if(!confirm('Excluir essa análise manual?')) return;
+    try{
+      await manuaisRef.doc(id).delete();
+    } catch(err){
+      console.error(err);
+      alert('Não foi possível excluir. Confira sua conexão.');
+    }
+  }
+
+  async function updateManualTotalJogo(id){
+    const input = document.getElementById('man-edit-total-' + id);
+    const resultEl = document.getElementById('man-edit-total-result-' + id);
+    const val = parseMaskedVal(input);
+    try{
+      await manuaisRef.doc(id).update({ totalJogo: isNaN(val) ? null : val });
+      resultEl.style.color = 'var(--safe)';
+      resultEl.textContent = '✓ Salvo.';
+    } catch(err){
+      console.error(err);
+      resultEl.style.color = 'var(--warn)';
+      resultEl.textContent = 'Não foi possível salvar.';
+    }
+  }
+
+  function renderManuaisStats(){
+    const summary = document.getElementById('man-stats-summary');
+    const total = manuaisAll.length;
+    const green = manuaisAll.filter(m => m.resultado === 'green').length;
+    const red = manuaisAll.filter(m => m.resultado === 'red').length;
+    const decididas = green + red;
+    const taxaAcerto = decididas ? Math.round((green / decididas) * 100) : 0;
+    const taxaErro = decididas ? Math.round((red / decididas) * 100) : 0;
+    summary.innerHTML = `
+      <div class="profit-card"><span class="num">${total}</span><span class="label">entradas no geral</span></div>
+      <div class="profit-card"><span class="num safe">${green}</span><span class="label">green</span></div>
+      <div class="profit-card"><span class="num warn">${red}</span><span class="label">red</span></div>
+      <div class="profit-card"><span class="num safe">${taxaAcerto}%</span><span class="label">média de acertos</span></div>
+      <div class="profit-card"><span class="num warn">${taxaErro}%</span><span class="label">média de erros</span></div>
+    `;
+  }
+
+  function renderManuaisSalvas(){
+    renderManuaisStats();
+    const container = document.getElementById('man-saved-container');
+    if(manuaisAll.length === 0){
+      container.innerHTML = `<div class="empty-state">Nenhuma análise manual salva ainda.</div>`;
+      return;
+    }
+    container.innerHTML = manuaisAll.map(m => {
+      const resultado = m.resultado || 'pendente';
+      let resultadoHtml;
+      if(resultado === 'pendente'){
+        resultadoHtml = `
+          <div class="result-buttons">
+            <button class="result-btn green" onclick="markManualResult('${m.id}','green')">Green</button>
+            <button class="result-btn red" onclick="markManualResult('${m.id}','red')">Red</button>
+          </div>`;
+      } else {
+        const badge = resultadoBadge(resultado);
+        resultadoHtml = `<span class="badge ${badge.cls} clickable" title="Clique para voltar a pendente" onclick="markManualResult('${m.id}','pendente')">${badge.label}</span>`;
+      }
+      const soma = m.soma != null ? Number(m.soma).toFixed(2) : '—';
+      const margem = m.margemSeguranca != null ? Number(m.margemSeguranca).toFixed(2) : '—';
+      return `
+        <div class="an-saved-item">
+          <div class="an-saved-row" style="cursor:default;">
+            <div class="an-saved-info">
+              <div class="name"><span class="arrow">▸</span> ${escapeHtml(m.time || '—')}${m.mando ? ` <span class="sep">·</span> ${escapeHtml(m.mando)}` : ''}</div>
+              <div class="an-market-highlight">Chutes ${escapeHtml(String(m.mediaChutes ?? '—'))}<span class="sep">·</span>Chutes ao gol ${escapeHtml(String(m.mediaChutesGol ?? '—'))}<span class="sep">·</span>Soma ${soma}${m.margemSeguranca != null ? `<span class="sep">·</span>Margem ${margem}` : ''}</div>
+              ${m.odd != null ? `<span class="an-odd-highlight">Odd<strong>${Number(m.odd).toFixed(2)}</strong></span>` : ''}
+            </div>
+          </div>
+          <div class="an-saved-toolbar">
+            ${m.casaAposta && m.casaAposta.dominio ? `<img class="an-casa-icon" src="${bookmakerIconUrl(m.casaAposta.dominio)}" alt="${escapeHtml(m.casaAposta.nome)}" title="${escapeHtml(m.casaAposta.nome)}">` : (m.casaAposta ? `<span class="an-mercado-chip">${escapeHtml(m.casaAposta.nome)}</span>` : '')}
+            ${resultadoHtml}
+            <button class="icon-btn" title="Excluir" onclick="deleteManual('${m.id}')">✕</button>
+          </div>
+          <div class="an-saved-detail" style="display:block;padding-top:0;">
+            <div class="an-check-box" style="margin-top:10px;">
+              <label>Total do jogo (preencher quando souber o resultado real)</label>
+              <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;">
+                <input type="text" inputmode="decimal" id="man-edit-total-${m.id}" value="${m.totalJogo != null ? String(m.totalJogo).replace('.', ',') : ''}" placeholder="ex: 15,0" style="max-width:140px;">
+                <button type="button" class="primary" style="width:auto;padding:9px 16px;" onclick="updateManualTotalJogo('${m.id}')">Salvar</button>
+              </div>
+              <div id="man-edit-total-result-${m.id}" style="margin-top:8px;font-size:12.5px;"></div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
 
   function extractAiJson(textBlock){
     const clean = textBlock.replace(/```json|```/g, '').trim();
