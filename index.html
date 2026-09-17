@@ -842,6 +842,42 @@
     color:var(--text);
     margin-left:4px;
   }
+  .an-margem-highlight{
+    display:inline-flex;
+    align-items:center;
+    padding:3px 9px;
+    border-radius:6px;
+    background:rgba(76,175,125,0.14);
+    color:var(--safe);
+    font-size:12px;
+    font-weight:400;
+  }
+  .an-margem-highlight strong{
+    font-weight:700;
+    margin-left:4px;
+  }
+  .app-toast{
+    position:fixed;
+    left:50%;
+    bottom:28px;
+    transform:translate(-50%, 12px);
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:12px 20px;
+    border-radius:10px;
+    font-size:13.5px;
+    font-weight:500;
+    box-shadow:0 8px 24px rgba(0,0,0,0.35);
+    opacity:0;
+    transition:opacity 0.25s ease, transform 0.25s ease;
+    z-index:999;
+    pointer-events:none;
+  }
+  .app-toast.show{
+    opacity:1;
+    transform:translate(-50%, 0);
+  }
 
   .header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
   .logout-btn{
@@ -1899,13 +1935,29 @@
 
     try{
       await manuaisRef.doc(id).update(update);
-      resultEl.style.color = 'var(--safe)';
-      resultEl.textContent = '✓ Atualizado.';
+      showToast('✓ Dados atualizados com sucesso');
+      expandedManualId = null;
+      renderManuaisSalvas();
     } catch(err){
       console.error(err);
       resultEl.style.color = 'var(--warn)';
       resultEl.textContent = 'Não foi possível salvar. Confira sua conexão.';
     }
+  }
+
+  function showToast(message){
+    const existing = document.getElementById('app-toast');
+    if(existing) existing.remove();
+    const toast = document.createElement('div');
+    toast.id = 'app-toast';
+    toast.className = 'app-toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 2200);
   }
 
   function renderManuaisSalvas(){
@@ -1936,8 +1988,8 @@
         <div class="an-saved-item">
           <div class="an-saved-row" style="cursor:default;">
             <div class="an-saved-info">
-              <div class="name"><span class="arrow">${isOpen ? '▾' : '▸'}</span> ${escapeHtml(m.time || '—')}${m.mando ? ` <span class="sep">·</span> ${escapeHtml(m.mando)}` : ''}${m.oddVitoria != null ? ` <span class="sep">·</span> ODD Vitória ${Number(m.oddVitoria).toFixed(2)}` : ''}</div>
-              <div class="an-market-highlight">Chutes ${escapeHtml(String(m.mediaChutes ?? '—'))}<span class="sep">·</span>Chutes ao gol ${escapeHtml(String(m.mediaChutesGol ?? '—'))}<span class="sep">·</span>Soma ${soma}${linhaNum != null ? `<span class="sep">·</span>Linha ${linhaNum}` : (m.linhaMercado ? `<span class="sep">·</span>${escapeHtml(m.linhaMercado)}` : '')}${m.margemSeguranca != null ? `<span class="sep">·</span>Margem ${margem}` : ''}${m.totalJogo != null ? `<span class="sep">·</span>Total do jogo ${Number(m.totalJogo).toFixed(1)}` : ''}</div>
+              <div class="name"><span class="arrow">${isOpen ? '▾' : '▸'}</span> ${escapeHtml(m.time || '—')}${m.mando ? ` <span class="sep">·</span> ${escapeHtml(m.mando)}` : ''}${m.oddVitoria != null ? ` <span class="sep">·</span> ODD Vitória ${Number(m.oddVitoria).toFixed(2)}` : ''}${m.margemSeguranca != null ? ` <span class="an-margem-highlight">Margem<strong>${margem}</strong></span>` : ''}</div>
+              <div class="an-market-highlight">Chutes ${escapeHtml(String(m.mediaChutes ?? '—'))}<span class="sep">·</span>Chutes ao gol ${escapeHtml(String(m.mediaChutesGol ?? '—'))}<span class="sep">·</span>Soma ${soma}${linhaNum != null ? `<span class="sep">·</span>Linha ${linhaNum}` : (m.linhaMercado ? `<span class="sep">·</span>${escapeHtml(m.linhaMercado)}` : '')}${m.totalJogo != null ? `<span class="sep">·</span>Total do jogo ${Number(m.totalJogo).toFixed(1)}` : ''}</div>
               ${m.odd != null ? `<span class="an-odd-highlight">Odd<strong>${Number(m.odd).toFixed(2)}</strong></span>` : ''}
             </div>
           </div>
