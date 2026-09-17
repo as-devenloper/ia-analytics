@@ -1989,8 +1989,8 @@
           <div class="an-saved-row" style="cursor:default;">
             <div class="an-saved-info">
               <div class="name"><span class="arrow">${isOpen ? '▾' : '▸'}</span> ${escapeHtml(m.time || '—')}${m.mando ? ` <span class="sep">·</span> ${escapeHtml(m.mando)}` : ''}${m.oddVitoria != null ? ` <span class="sep">·</span> ODD Vitória ${Number(m.oddVitoria).toFixed(2)}` : ''}${m.margemSeguranca != null ? ` <span class="an-margem-highlight">Margem<strong>${margem}</strong></span>` : ''}</div>
-              <div class="an-market-highlight">Chutes ${escapeHtml(String(m.mediaChutes ?? '—'))}<span class="sep">·</span>Chutes ao gol ${escapeHtml(String(m.mediaChutesGol ?? '—'))}<span class="sep">·</span>Soma ${soma}${linhaNum != null ? `<span class="sep">·</span>Linha ${linhaNum}` : (m.linhaMercado ? `<span class="sep">·</span>${escapeHtml(m.linhaMercado)}` : '')}${m.totalJogo != null ? `<span class="sep">·</span>Total do jogo ${Number(m.totalJogo).toFixed(1)}` : ''}</div>
-              ${m.odd != null ? `<span class="an-odd-highlight">Odd<strong>${Number(m.odd).toFixed(2)}</strong></span>` : ''}
+              <div class="an-market-highlight">Chutes ${escapeHtml(String(m.mediaChutes ?? '—'))}<span class="sep">·</span>Chutes ao gol ${escapeHtml(String(m.mediaChutesGol ?? '—'))}<span class="sep">·</span>Soma ${soma}${linhaNum != null ? `<span class="sep">·</span>Linha ${linhaNum}` : (m.linhaMercado ? `<span class="sep">·</span>${escapeHtml(m.linhaMercado)}` : '')}${m.odd != null ? `<span class="sep">·</span>Odd ${Number(m.odd).toFixed(2)}` : ''}</div>
+              ${m.totalJogo != null ? `<span class="an-odd-highlight">Total do jogo<strong>${Number(m.totalJogo).toFixed(1)}</strong></span>` : ''}
             </div>
           </div>
           <div class="an-saved-toolbar">
